@@ -11,18 +11,19 @@ service PollsGreeter {
 
 // The request message containing the user's name.
 message ListPollsRequest {
-  int64 offset = 0;
-  int64 limit = 10;
-  string searchParam;
+  int32 offset = 1;
+  int32 limit = 2;
+  string searchParam = 3;
 }
 
 // The response message containing the greetings.
 message ListPollsResponse {
-  repeated GetPollDto results;
+  repeated ListPollsDto records = 1;
+  int64 totalRecords = 2;
 }
 
- message GetPollDto {
-   number id;
-   string name;
-   string description;
+ message ListPollsDto {
+   int64 id = 1;
+   string name = 2;
+   string description = 3;
 }

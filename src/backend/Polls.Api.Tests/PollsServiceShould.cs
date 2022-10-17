@@ -1,7 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
-using Polls.Api.DTO;
+using Polls.Lib.DTO;
+using Polls.Lib.Enums;
 using System.Net;
 using System.Text;
 
@@ -28,12 +29,12 @@ namespace Polls.Api.Tests
                 {
                     new CreateQuestionDto()
                     {
-                        QuestionType = Enums.QuestionType.YesNoAnswer,
+                        QuestionType = QuestionType.YesNoAnswer,
                         Text = "This is yes/no type question?"
                     },
                      new CreateQuestionDto()
                     {
-                        QuestionType = Enums.QuestionType.SingleChoice,
+                        QuestionType = QuestionType.SingleChoice,
                         Text = "This is single choice question?",
                         Choices = new List<CreateChoiceDto>()
                         {
@@ -51,7 +52,7 @@ namespace Polls.Api.Tests
                     },
                       new CreateQuestionDto()
                     {
-                        QuestionType = Enums.QuestionType.MultipleChoice,
+                        QuestionType = QuestionType.MultipleChoice,
                         Text = "This is multiple choice question?",
                         Choices = new List<CreateChoiceDto>()
                         {
@@ -75,7 +76,7 @@ namespace Polls.Api.Tests
                     },
                        new CreateQuestionDto()
                     {
-                        QuestionType = Enums.QuestionType.TextAnswer,
+                        QuestionType = QuestionType.TextAnswer,
                         Text = "This is test type question, write anything down."
                     },
                 }

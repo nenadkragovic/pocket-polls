@@ -23,7 +23,7 @@ namespace Polls.Api.Tests
                     {
                     })
                     .UseEnvironment("Development")
-                    .UseStartup<Startup>();
+                    .UseStartup<Program>();
 
             TestServer = new TestServer(builder);
             Client = TestServer.CreateClient();

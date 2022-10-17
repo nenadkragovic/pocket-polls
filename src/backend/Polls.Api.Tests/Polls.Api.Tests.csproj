@@ -25,7 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\polls-api\Polls.Api.csproj" />
+    <ProjectReference Include="..\Polls.Api\Polls.Api.csproj" />
+    <ProjectReference Include="..\Polls.Lib\Polls.Lib.csproj" />
   </ItemGroup>
 
 </Project>

@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Polls.Lib\Polls.Lib.csproj" />
+    <Protobuf Include="Protos\polls.proto" GrpcServices="Server" />
   </ItemGroup>
 
 </Project>

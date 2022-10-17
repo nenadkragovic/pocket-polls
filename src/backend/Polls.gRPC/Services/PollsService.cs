@@ -1,20 +1,32 @@
 using Grpc.Core;
-using Polls.gRPC;
+using Polls.Lib.Repositories;
 
 namespace Polls.gRPC.Services
 {
-    public class PollsService
+    public class PollsService : PollsGreeter.PollsGreeterBase
     {
-        public PollsService()
+        private readonly PollsRepository _pollsRepository;
+        public PollsService(PollsRepository pollsRepository)
         {
+            _pollsRepository = pollsRepository;
         }
 
-        //public override Task<ListPollsResponse> ListPolls(ListPollsRequest request, ServerCallContext context)
-        //{
-        //    return Task.FromResult(new ListPollsResponse
-        //    {
+        public override async Task<ListPollsResponse> ListPolls(ListPollsRequest request, ServerCallContext context)
+        {
+            var result = await _pollsRepository.ListPolls(request.Offset, request.Limit, request.SearchParam);
 
-        //    });
-        //}
+            return new ListPollsResponse()
+            {
+                TotalRecords = result.TotalRecords,
+                Records = {
+                    result.Records.Select(r => new ListPollsDto()
+                    {
+                        Id = r.Id,
+                        Name = r.Name,
+                        Description = r.Description
+                    }).ToList()
+                }
+            };
+        }
     }
 }

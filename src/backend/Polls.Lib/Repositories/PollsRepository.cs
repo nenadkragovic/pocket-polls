@@ -17,7 +17,7 @@ namespace Polls.Lib.Repositories
         }
 
         #region Public Methods
-        public async Task<ListResult<GetPollDto>> ListPolls(int offset, byte limit, string searchParam = "")
+        public async Task<ListResult<GetPollDto>> ListPolls(int offset, int limit, string searchParam = "")
         {
             var query = _context.Polls.AsNoTracking();
 
