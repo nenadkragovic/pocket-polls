@@ -82,10 +82,14 @@ export class TextQuestion extends Question {
 
 export class Poll {
     name: string;
+    description: string;
+    image: string;
     questions: Question[];
 
     constructor(){
         this.name = '';
+        this.description = '';
+        this.image = '';
         this.questions = new Array<Question>();
     }
 
