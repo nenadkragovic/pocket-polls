@@ -13,3 +13,11 @@ React PWA playground
     - multiple choice
     - text answer
 5. Answer - Respondant answer to specific question
+
+
+## Sources
+
+### Mongo
+https://www.mongodb.com/developer/languages/csharp/create-restful-api-dotnet-core-mongodb/
+https://www.mongodb.com/docs/manual/tutorial/install-mongodb-on-windows/
+https://www.mongodb.com/try/download/community2

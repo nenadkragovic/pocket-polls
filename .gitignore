@@ -102,3 +102,16 @@ dist
 
 # TernJS port file
 .tern-port
+/src/backend/polls-api/obj
+/src/backend/polls-api/.vs
+/src/backend/polls-api/bin
+/src/backend/Polls.Api.Tests/obj
+/src/backend/Polls.Api.Tests/bin
+/src/backend/Polls.gRPC/obj
+/src/backend/Polls.gRPC/bin
+/src/backend/.vs
+/src/backend/Polls.Api/obj
+/src/backend/Polls.Api/.vs
+/src/backend/Polls.Api/bin
+bin
+obj

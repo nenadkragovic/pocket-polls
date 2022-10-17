@@ -1,0 +1,28 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Polls.gRPC";
+
+package polls;
+
+service PollsGreeter {
+  // Sends a greeting
+  rpc ListPolls (ListPollsRequest) returns (ListPollsResponse);
+}
+
+// The request message containing the user's name.
+message ListPollsRequest {
+  int64 offset = 0;
+  int64 limit = 10;
+  string searchParam;
+}
+
+// The response message containing the greetings.
+message ListPollsResponse {
+  repeated GetPollDto results;
+}
+
+ message GetPollDto {
+   number id;
+   string name;
+   string description;
+}
