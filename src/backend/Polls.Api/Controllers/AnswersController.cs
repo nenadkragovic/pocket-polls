@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
-using Polls.Lib.Exceptions;
 using Polls.Lib.Repositories;
 
 namespace Polls.Api.Controllers;
@@ -10,32 +9,19 @@ namespace Polls.Api.Controllers;
 [Route("api/answers")]
 public class AnswersController : ControllerBase
 {
-    private readonly PollsRepository _pollsRepository;
+    private readonly AnswersRepository _answersRepository;
 
-    public AnswersController(PollsRepository pollsRepository)
+    public AnswersController(AnswersRepository answersRepository)
     {
-        _pollsRepository = pollsRepository;
+        _answersRepository = answersRepository;
     }
 
-    [HttpGet]
-    [ProducesResponseType(typeof(ICollection<LiustPollsDto>), 200)]
-    [ProducesResponseType(204)]
-    public async Task<IActionResult> List([FromQuery] int offset = 0, [FromQuery] byte limit = 10, [FromQuery] string? searchParam = "")
-    {
-        var result = await _pollsRepository.ListPolls(offset, limit, searchParam ?? "");
-
-        if (result == null || result.TotalRecords == 0)
-            return NoContent();
-
-        return Ok(result);
-    }
-
-    [HttpGet("{id}")]
+    [HttpGet("{pollId}")]
     [ProducesResponseType(typeof(Poll), 200)]
     [ProducesResponseType(204)]
-    public async Task<IActionResult> Get([FromRoute] long id)
+    public async Task<IActionResult> Get([FromRoute] long pollId)
     {
-        var result = await _pollsRepository.GetPollById(id);
+        var result = await _answersRepository.GetAnswersByPollId(pollId);
 
         if (result != null)
             return Ok(result);
@@ -43,17 +29,17 @@ public class AnswersController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost]
-    [ProducesResponseType(typeof(Poll), 201)]
+    [HttpPost("{pollId}")]
+    [ProducesResponseType(200)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreatePoll([FromBody] CreatePollDto model)
+    public async Task<IActionResult> AddAnswers([FromRoute] long pollId, [FromBody] AddAnswersDto model)
     {
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var poll = await _pollsRepository.AddPoll(model);
+        await _answersRepository.AddAnswers("1efc5e3a-283b-4b05-b1ea-d2cd424c59d4", pollId , model);
 
-        return Created($"polls/{poll?.Id}", poll);
+        return Ok();
 
     }
 }

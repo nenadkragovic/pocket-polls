@@ -13,6 +13,7 @@ namespace Polls.Lib.Database.Models
         public string UserId { get; set; }
         public long QuestionId { get; set; }
         public QuestionType QuestionType { get; set; }
+        public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
         public virtual User User { get; set; }
     }

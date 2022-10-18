@@ -67,6 +67,8 @@ namespace Polls.Lib.Repositories
             {
                 Name = model.Name,
                 Description = model.Description,
+                StartDate = model.StartDate,
+                EndDate = model.EndDate
             };
 
             AttachQuestions(record, model.Questions);

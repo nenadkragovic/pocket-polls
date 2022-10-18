@@ -7,7 +7,7 @@ namespace Polls.Lib.DTO
         public ICollection<YesNoAnswerDto> YesNoAnswers { get; set; }
         public ICollection<TextAnswerDto> TextAnswers { get; set; }
         public ICollection<SingleChoiceAnswerDto> SingleChoiceAnswers { get; set; }
-        public ICollection<MultipleChoiceAnswerDto> MultipleChoiceAnswer { get; set; }
+        public ICollection<MultipleChoiceAnswerDto> MultipleChoiceAnswers { get; set; }
     }
 
     public class YesNoAnswerDto

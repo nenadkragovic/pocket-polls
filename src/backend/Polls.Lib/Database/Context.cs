@@ -11,7 +11,8 @@ namespace Polls.Lib.Database
         private const string ADMIN_PASSWORD = "Admin";
         private const string ADMIN_EMAIL = "test@admin.com";
         private const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
-
+        public const string ADMIN_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268f";
+        public const string USER_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268E";
 
         public virtual DbSet<Poll> Polls { get; set; }
         public virtual DbSet<YesNoQuestion> YesNoQuestions { get; set; }
@@ -61,7 +62,15 @@ namespace Polls.Lib.Database
                 PasswordHash = hasher.HashPassword(null, ADMIN_PASSWORD),
                 EmailConfirmed = true,
                 SecurityStamp = string.Empty
+            });
 
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasData(new List<Role>()
+                {
+                    new Role() { Id = ADMIN_ROLE_ID, Name = "Admin", NormalizedName = "ADMIN" },
+                    new Role() { Id = USER_ROLE_ID, Name = "User", NormalizedName = "USER" }
+                });
             });
 
             modelBuilder.Entity<Poll>(entity =>
