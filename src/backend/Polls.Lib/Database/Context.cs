@@ -1,10 +1,18 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Polls.Lib.Database.Models;
 
 namespace Polls.Lib.Database
 {
-    public class Context : DbContext
+    public class Context : IdentityDbContext<User, Role, string>
     {
+        private const string ADMIN_USERNAME = "Admin";
+        private const string ADMIN_PASSWORD = "Admin";
+        private const string ADMIN_EMAIL = "test@admin.com";
+        private const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
+
+
         public virtual DbSet<Poll> Polls { get; set; }
         public virtual DbSet<YesNoQuestion> YesNoQuestions { get; set; }
         public virtual DbSet<SingleChoiceQuestion> SingleChoiceQuestions { get; set; }
@@ -26,12 +34,45 @@ namespace Polls.Lib.Database
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(@"Server=(localdb)\\Local;Database=PollsDb;User id=sa;Password=Fazi.12358;Trusted_Connection=True;");
+                throw new Exception("Database server is not configured!");
             }
+
+            base.OnConfiguring(optionsBuilder);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+            modelBuilder.Ignore<IdentityUserLogin<string>>();
+            modelBuilder.Ignore<IdentityUserRole<string>>();
+            modelBuilder.Ignore<IdentityUserClaim<string>>();
+            modelBuilder.Ignore<IdentityUserToken<string>>();
+            modelBuilder.Ignore<IdentityUser<string>>();
+
+            var hasher = new PasswordHasher<IdentityUser>();
+
+            modelBuilder.Entity<User>().HasData(new User()
+            {
+                Id = ADMIN_ID,
+                UserName = ADMIN_USERNAME,
+                NormalizedUserName = ADMIN_USERNAME.ToUpperInvariant(),
+                Email = ADMIN_EMAIL,
+                NormalizedEmail = ADMIN_EMAIL.ToUpperInvariant(),
+                PasswordHash = hasher.HashPassword(null, ADMIN_PASSWORD),
+                EmailConfirmed = true,
+                SecurityStamp = string.Empty
+
+            });
+
+            modelBuilder.Entity<Poll>(entity =>
+            {
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.Polls)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_User_Polls");
+            });
+
             modelBuilder.Entity<YesNoQuestion>(entity =>
             {
                 entity.HasOne(d => d.Poll)
@@ -73,8 +114,14 @@ namespace Polls.Lib.Database
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.YesNoAnswers)
                     .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Question_YesNoAnswers");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.YesNoAnswers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_User_YesNoAnswers");
             });
 
             modelBuilder.Entity<SingleChoiceAnswer>(entity =>
@@ -83,8 +130,14 @@ namespace Polls.Lib.Database
                 entity.HasOne(d => d.Question)
                     .WithMany(p => p.SingleChoiceAnswers)
                     .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Question_SingleChoiceAnswers");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.SingleChoiceAnswers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.NoAction)
+                    .HasConstraintName("FK_User_SingleChoiceAnswers");
             });
 
             modelBuilder.Entity<MultipleChoiceAnswer>(entity =>
@@ -94,6 +147,12 @@ namespace Polls.Lib.Database
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Question_MultipleChoiceAnswer");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.MultipleChoiceAnswers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_User_MultipleChoiceAnswers");
             });
 
             modelBuilder.Entity<TextAnswer>(entity =>
@@ -103,6 +162,12 @@ namespace Polls.Lib.Database
                     .HasForeignKey(d => d.QuestionId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_Question_TextAnswers");
+
+                entity.HasOne(d => d.User)
+                    .WithMany(p => p.TextAnswers)
+                    .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.Cascade)
+                    .HasConstraintName("FK_User_TextAnswers");
             });
 
             modelBuilder.Entity<SingleChoiceOption>(entity =>
@@ -110,7 +175,7 @@ namespace Polls.Lib.Database
                 entity.HasOne(d => d.SingleChoiceQuestion)
                     .WithMany(p => p.Choices)
                     .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_SingleChoiceQuestion_Choices");
             });
 
@@ -119,7 +184,7 @@ namespace Polls.Lib.Database
                 entity.HasOne(d => d.MultipleChoiceQuestion)
                     .WithMany(p => p.Choices)
                     .HasForeignKey(d => d.QuestionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_MultipleChoiceQuestion_Choices");
             });
 
@@ -130,13 +195,13 @@ namespace Polls.Lib.Database
                 entity.HasOne(d => d.Anwser)
                     .WithMany(p => p.MultipleChoiceQuestionsAnswers)
                     .HasForeignKey(d => d.AnswerId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_MultipleChoiceQuestionsAnswer_MultipleChoiceOption");
 
                 entity.HasOne(d => d.MultipleChoiceOption)
                     .WithMany(p => p.MultipleChoiceQuestionsAnswers)
                     .HasForeignKey(d => d.MultipleChoiceOptionId)
-                    .OnDelete(DeleteBehavior.Cascade)
+                    .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_MultipleChoiceOption_MultipleChoiceQuestionsAnswer");
             });
         }

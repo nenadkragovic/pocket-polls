@@ -17,7 +17,7 @@ namespace Polls.Lib.Repositories
         }
 
         #region Public Methods
-        public async Task<ListResult<GetPollDto>> ListPolls(int offset, int limit, string searchParam = "")
+        public async Task<ListResult<LiustPollsDto>> ListPolls(int offset, int limit, string searchParam = "")
         {
             var query = _context.Polls.AsNoTracking();
 
@@ -30,7 +30,7 @@ namespace Polls.Lib.Repositories
 
             var records = await _context.Polls
                 .Skip(offset).Take(limit)
-                .Select(p => new GetPollDto()
+                .Select(p => new LiustPollsDto()
                 {
                     Id = p.Id,
                     Name = p.Name,
@@ -38,7 +38,7 @@ namespace Polls.Lib.Repositories
                 })
                 .ToListAsync();
 
-            return new ListResult<GetPollDto>()
+            return new ListResult<LiustPollsDto>()
             {
                 Records = records,
                 TotalRecords = total

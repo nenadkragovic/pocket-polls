@@ -10,17 +10,15 @@ namespace Polls.Api.Controllers;
 [Route("api/polls")]
 public class PollsController : ControllerBase
 {
-    private readonly ILogger<PollsController> _logger;
     private readonly PollsRepository _pollsRepository;
 
-    public PollsController(ILogger<PollsController> logger, PollsRepository pollsRepository)
+    public PollsController(PollsRepository pollsRepository)
     {
-        _logger = logger;
         _pollsRepository = pollsRepository;
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ICollection<GetPollDto>), 200)]
+    [ProducesResponseType(typeof(ICollection<LiustPollsDto>), 200)]
     [ProducesResponseType(204)]
     public async Task<IActionResult> List([FromQuery] int offset = 0, [FromQuery] byte limit = 10, [FromQuery] string? searchParam = "")
     {

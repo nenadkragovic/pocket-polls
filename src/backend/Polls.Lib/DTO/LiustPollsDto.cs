@@ -1,6 +1,6 @@
 ﻿namespace Polls.Lib.DTO
 {
-    public class GetPollDto
+    public class LiustPollsDto
     {
         public long Id { get; set; }
         public string Name { get; set; }

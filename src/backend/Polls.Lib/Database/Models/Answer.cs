@@ -7,8 +7,14 @@ namespace Polls.Lib.Database.Models
     {
         [Key]
         public long Id { get; set; }
+        /// <summary>
+        /// Id of user that answerd questions
+        /// </summary>
+        public string UserId { get; set; }
         public long QuestionId { get; set; }
         public QuestionType QuestionType { get; set; }
+
+        public virtual User User { get; set; }
     }
 
     public class YesNoAnswer : Answer
