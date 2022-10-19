@@ -67,18 +67,22 @@ namespace Polls.Api.Tests
                             new CreateChoiceDto()
                             {
                                 Name = "Option 1",
+                                Description = "",
                             },
                             new CreateChoiceDto()
                             {
                                 Name = "Option 2",
+                                Description = "",
                             },
                             new CreateChoiceDto()
                             {
                                 Name = "Option 3",
+                                Description = "",
                             },
                             new CreateChoiceDto()
                             {
                                 Name = "Option 4",
+                                Description = "",
                             }
                         }
                     },
@@ -92,8 +96,7 @@ namespace Polls.Api.Tests
 
             var response = await _server.CreateRequest($"/api/polls")
                 .And(x => x.Content =
-                    new StringContent(
-                        JsonConvert.SerializeObject(createPollDto), Encoding.UTF8, "application/json"))
+                    new StringContent(JsonConvert.SerializeObject(createPollDto), Encoding.UTF8, "application/json"))
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
