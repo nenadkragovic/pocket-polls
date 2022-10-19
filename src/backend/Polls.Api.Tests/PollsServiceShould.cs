@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Newtonsoft.Json;
 using Polls.Lib.DTO;
@@ -9,13 +10,18 @@ using System.Text;
 namespace Polls.Api.Tests
 {
     [Collection("PollsCollection")]
-    public class PollsServiceShould
+    public class PollsServiceShould : IClassFixture<WebApplicationFactory<Program>>
     {
         private readonly TestServer _server;
+        private readonly HttpClient _client;
 
-        public PollsServiceShould(TestServerFixture fixture)
+        public PollsServiceShould()
         {
-            _server = fixture.TestServer;
+            var application = new WebApplicationFactory<Program>();
+
+            _client = application.CreateClient();
+
+            _server = application.Server;
         }
 
         [Fact]
@@ -25,6 +31,8 @@ namespace Polls.Api.Tests
             {
                 Name = "Test poll",
                 Description = "This is test poll",
+                StartDate = DateTime.MinValue,
+                EndDate = DateTime.MaxValue,
                 Questions = new List<CreateQuestionDto>()
                 {
                     new CreateQuestionDto()
@@ -89,6 +97,15 @@ namespace Polls.Api.Tests
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
+        }
+
+        [Fact]
+        public async Task ListPollsShouldReturnNoContent()
+        {
+            var response = await _server.CreateRequest($"/api/polls")
+                .GetAsync();
+
+            response.StatusCode.Should().Be(HttpStatusCode.NoContent);
         }
     }
 }
