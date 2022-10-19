@@ -14,6 +14,7 @@ namespace Polls.Lib.Database.Models
     public class SingleChoiceOption : ChoiceOption
     {
         public SingleChoiceQuestion SingleChoiceQuestion { get; set; }
+        public ICollection<SingleChoiceAnswer> SingleChoiceAnswers { get; set; }
     }
 
     public class MultipleChoiceOption : ChoiceOption

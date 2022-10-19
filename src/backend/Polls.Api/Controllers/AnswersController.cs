@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
 using Polls.Lib.Repositories;
+using Serilog;
 
 namespace Polls.Api.Controllers;
 
@@ -37,9 +38,18 @@ public class AnswersController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        await _answersRepository.AddAnswers("1efc5e3a-283b-4b05-b1ea-d2cd424c59d4", pollId , model);
+        try
+        {
+            await _answersRepository.AddAnswers("1efc5e3a-283b-4b05-b1ea-d2cd424c59d4", pollId, model);
 
-        return Ok();
+            return Ok();
+        }
+        catch (Exception e)
+        {
+            Log.Error(e, e.Message);
+
+            return BadRequest(e.Message);
+        }
 
     }
 }

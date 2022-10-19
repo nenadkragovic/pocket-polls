@@ -11,7 +11,7 @@ namespace Polls.Lib.DTO
         public string Description { get; set; }
         public DateTime StartDate { get; set; } = DateTime.MinValue;
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
-        public ICollection<CreateQuestionDto> Questions { get; set; }
+        public ICollection<CreateQuestionDto>? Questions { get; set; }
 
     }
 

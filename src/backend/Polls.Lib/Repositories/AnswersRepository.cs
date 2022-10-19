@@ -30,7 +30,7 @@ namespace Polls.Lib.Repositories
                 UserId = userId,
                 QuestionId = a.QuestionId,
                 QuestionType = Enums.QuestionType.SingleChoice,
-                ChoiceId = a.ChoiceId
+                SingleChoiceId = a.ChoiceId
             }));
 
             _context.MultipleChoiceAnswers.AddRange(model.MultipleChoiceAnswers.Select(a => new MultipleChoiceAnswer()

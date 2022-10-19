@@ -1,4 +1,5 @@
-﻿using Polls.Lib.Enums;
+﻿using Microsoft.AspNetCore.Identity;
+using Polls.Lib.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace Polls.Lib.Database.Models
@@ -15,7 +16,7 @@ namespace Polls.Lib.Database.Models
         public QuestionType QuestionType { get; set; }
         public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
-        public virtual User User { get; set; }
+        public virtual IdentityUser User { get; set; }
     }
 
     public class YesNoAnswer : Answer
@@ -26,7 +27,7 @@ namespace Polls.Lib.Database.Models
 
     public class SingleChoiceAnswer : Answer
     {
-        public long ChoiceId { get; set; }
+        public long SingleChoiceId { get; set; }
 
         public SingleChoiceQuestion Question { get; set; }
         public SingleChoiceOption SingleChoice { get; set; }

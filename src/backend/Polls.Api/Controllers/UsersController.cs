@@ -1,9 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
-using Polls.Lib.Repositories;
 
 namespace Polls.Api.Controllers;
 
@@ -11,11 +11,13 @@ namespace Polls.Api.Controllers;
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-    private readonly UserStore _userStore;
+    private readonly UserManager<IdentityUser> _userManager;
+    private readonly SignInManager<IdentityUser> _signInManager;
 
-    public UsersController(UserStore userStore)
+    public UsersController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
     {
-        _userStore = userStore;
+        _userManager = userManager;
+        _signInManager = signInManager;
     }
 
     //[HttpGet("{pollId}")]
@@ -34,20 +36,26 @@ public class UsersController : ControllerBase
     [HttpPost]
     [ProducesResponseType(201)]
     [ProducesResponseType(400)]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto user)
+    [AllowAnonymous]
+    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto model)
     {
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var result = await _userStore.CreateAsync(new User()
+        var user = new IdentityUser
         {
-            UserName = user.UserName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber
-        });
-
+            Id = Guid.NewGuid().ToString(),
+            UserName = model.UserName,
+            Email = model.Email,
+            PhoneNumber = model.PhoneNumber,
+        };
+        var result = await _userManager.CreateAsync(user, model.Password);
         if (result.Succeeded)
-            return Created("", null);
+        {
+            //await _signInManager.SignInAsync(user, isPersistent: false);
+
+            return Created($"api/users/{user.Id}", user);
+        }
 
         return BadRequest();
 

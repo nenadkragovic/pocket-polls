@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
 using Polls.Lib.Exceptions;
@@ -51,7 +52,7 @@ public class PollsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var poll = await _pollsRepository.AddPoll(model);
+        var poll = await _pollsRepository.AddPoll(Context.ADMIN_ID, model);
 
         return Created($"polls/{poll?.Id}", poll);
 
@@ -82,7 +83,6 @@ public class PollsController : ControllerBase
 
         try
         {
-
             await _pollsRepository.DeleteQuestions(pollId, questionsToDelete);
 
             return Ok();

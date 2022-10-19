@@ -5,12 +5,12 @@ using Polls.Lib.Database.Models;
 
 namespace Polls.Lib.Database
 {
-    public class Context : IdentityDbContext<User, Role, string>
+    public class Context : IdentityDbContext
     {
         private const string ADMIN_USERNAME = "Admin";
         private const string ADMIN_PASSWORD = "Admin";
         private const string ADMIN_EMAIL = "test@admin.com";
-        private const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
+        public const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
         public const string ADMIN_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268f";
         public const string USER_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268E";
 
@@ -52,7 +52,7 @@ namespace Polls.Lib.Database
 
             var hasher = new PasswordHasher<IdentityUser>();
 
-            modelBuilder.Entity<User>().HasData(new User()
+            modelBuilder.Entity<IdentityUser>().HasData(new IdentityUser()
             {
                 Id = ADMIN_ID,
                 UserName = ADMIN_USERNAME,
@@ -64,19 +64,19 @@ namespace Polls.Lib.Database
                 SecurityStamp = string.Empty
             });
 
-            modelBuilder.Entity<Role>(entity =>
+            modelBuilder.Entity<IdentityRole>(entity =>
             {
-                entity.HasData(new List<Role>()
+                entity.HasData(new List<IdentityRole>()
                 {
-                    new Role() { Id = ADMIN_ROLE_ID, Name = "Admin", NormalizedName = "ADMIN" },
-                    new Role() { Id = USER_ROLE_ID, Name = "User", NormalizedName = "USER" }
+                    new IdentityRole() { Id = ADMIN_ROLE_ID, Name = "Admin", NormalizedName = "ADMIN" },
+                    new IdentityRole() { Id = USER_ROLE_ID, Name = "User", NormalizedName = "USER" }
                 });
             });
 
             modelBuilder.Entity<Poll>(entity =>
             {
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.Polls)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_User_Polls");
@@ -127,7 +127,7 @@ namespace Polls.Lib.Database
                     .HasConstraintName("FK_Question_YesNoAnswers");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.YesNoAnswers)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_User_YesNoAnswers");
@@ -142,8 +142,10 @@ namespace Polls.Lib.Database
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_Question_SingleChoiceAnswers");
 
+                entity.HasOne(d => d.SingleChoice).WithMany(a => a.SingleChoiceAnswers).HasForeignKey(k => k.SingleChoiceId);
+
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.SingleChoiceAnswers)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.NoAction)
                     .HasConstraintName("FK_User_SingleChoiceAnswers");
@@ -158,7 +160,7 @@ namespace Polls.Lib.Database
                     .HasConstraintName("FK_Question_MultipleChoiceAnswer");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.MultipleChoiceAnswers)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_User_MultipleChoiceAnswers");
@@ -173,7 +175,7 @@ namespace Polls.Lib.Database
                     .HasConstraintName("FK_Question_TextAnswers");
 
                 entity.HasOne(d => d.User)
-                    .WithMany(p => p.TextAnswers)
+                    .WithMany()
                     .HasForeignKey(d => d.UserId)
                     .OnDelete(DeleteBehavior.Cascade)
                     .HasConstraintName("FK_User_TextAnswers");

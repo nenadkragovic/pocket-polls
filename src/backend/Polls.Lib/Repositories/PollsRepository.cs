@@ -61,17 +61,21 @@ namespace Polls.Lib.Repositories
                 .AsNoTracking().FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
-        public async Task<Poll?> AddPoll(CreatePollDto model)
+        public async Task<Poll?> AddPoll(string userId, CreatePollDto model)
         {
             var record = new Poll()
             {
+                UserId = userId,
                 Name = model.Name,
                 Description = model.Description,
                 StartDate = model.StartDate,
                 EndDate = model.EndDate
             };
 
-            AttachQuestions(record, model.Questions);
+            if (model.Questions != null)
+            {
+                AttachQuestions(record, model.Questions);
+            }
 
             var poll = _context.Polls.Add(record);
 
@@ -141,28 +145,23 @@ namespace Polls.Lib.Repositories
                 switch (questions.QuestionType)
                 {
                     case QuestionType.YesNoAnswer:
-                        _context.YesNoQuestions.RemoveRange(
-                            await _context.YesNoQuestions
-                                .Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id))
-                                .ToListAsync());
+                        _context.YesNoAnswers.RemoveRange(await _context.YesNoAnswers.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.YesNoQuestions.RemoveRange(await _context.YesNoQuestions.Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id)).ToListAsync());
                         break;
                     case QuestionType.SingleChoice:
-                        _context.SingleChoiceQuestions.RemoveRange(
-                            await _context.SingleChoiceQuestions
-                                .Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id))
-                                .ToListAsync());
+                        _context.SingleChoiceAnswers.RemoveRange(await _context.SingleChoiceAnswers.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.SingleChoiceOption.RemoveRange(await _context.SingleChoiceOption.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.SingleChoiceQuestions.RemoveRange(await _context.SingleChoiceQuestions.Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id)).ToListAsync());
                         break;
                     case QuestionType.MultipleChoice:
-                        _context.MultipleChoiceQuestions.RemoveRange(
-                            await _context.MultipleChoiceQuestions
-                                .Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id))
-                                .ToListAsync());
+                        _context.MultipleChoiceQuestionsAnswer.RemoveRange(await _context.MultipleChoiceQuestionsAnswer.Where(a => questions.QuestionIds.Contains(a.MultipleChoiceOption.QuestionId)).ToListAsync());
+                        _context.MultipleChoiceAnswers.RemoveRange(await _context.MultipleChoiceAnswers.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.MultipleChoiceOption.RemoveRange(await _context.MultipleChoiceOption.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.MultipleChoiceQuestions.RemoveRange(await _context.MultipleChoiceQuestions.Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id)).ToListAsync());
                         break;
                     case QuestionType.TextAnswer:
-                        _context.TextQuestions.RemoveRange(
-                            await _context.TextQuestions
-                                .Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id))
-                                .ToListAsync());
+                        _context.TextAnswers.RemoveRange(await _context.TextAnswers.Where(a => questions.QuestionIds.Contains(a.QuestionId)).ToListAsync());
+                        _context.TextQuestions.RemoveRange(await _context.TextQuestions.Where(q => q.PollId == pollId && questions.QuestionIds.Contains(q.Id)).ToListAsync());
                         break;
                 }
             }
@@ -176,6 +175,21 @@ namespace Polls.Lib.Repositories
 
             if (poll == null)
                 throw new RecordNotFoundException($"Poll with id: {pollId} is not found.");
+
+            _context.YesNoAnswers.RemoveRange(await _context.YesNoAnswers.Where(a => a.Question.PollId == pollId).ToListAsync());
+            _context.YesNoQuestions.RemoveRange(await _context.YesNoQuestions.Where(q => q.PollId == pollId).ToListAsync());
+
+            _context.SingleChoiceAnswers.RemoveRange(await _context.SingleChoiceAnswers.Where(a => a.Question.PollId == pollId).ToListAsync());
+            _context.SingleChoiceOption.RemoveRange(await _context.SingleChoiceOption.Where(a => a.SingleChoiceQuestion.PollId == pollId).ToListAsync());
+            _context.SingleChoiceQuestions.RemoveRange(await _context.SingleChoiceQuestions.Where(q => q.PollId == pollId ).ToListAsync());
+
+            _context.MultipleChoiceQuestionsAnswer.RemoveRange(await _context.MultipleChoiceQuestionsAnswer.Where(a => a.MultipleChoiceOption.MultipleChoiceQuestion.PollId == pollId).ToListAsync());
+            _context.MultipleChoiceAnswers.RemoveRange(await _context.MultipleChoiceAnswers.Where(a => a.Question.PollId == pollId).ToListAsync());
+            _context.MultipleChoiceOption.RemoveRange(await _context.MultipleChoiceOption.Where(a => a.MultipleChoiceQuestion.PollId == pollId).ToListAsync());
+            _context.MultipleChoiceQuestions.RemoveRange(await _context.MultipleChoiceQuestions.Where(q => q.PollId == pollId).ToListAsync());
+
+            _context.TextAnswers.RemoveRange(await _context.TextAnswers.Where(a => a.Question.PollId == pollId).ToListAsync());
+            _context.TextQuestions.RemoveRange(await _context.TextQuestions.Where(q => q.PollId == pollId).ToListAsync());
 
             _context.Polls.Remove(poll);
 

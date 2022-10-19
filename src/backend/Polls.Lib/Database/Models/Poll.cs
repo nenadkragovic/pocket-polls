@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 
 namespace Polls.Lib.Database.Models
 {
@@ -17,7 +18,7 @@ namespace Polls.Lib.Database.Models
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
 
-        public virtual User User { get; set; }
+        public virtual IdentityUser User { get; set; }
         public virtual ICollection<YesNoQuestion> YesNoQuestions { get; set; }
         public virtual ICollection<SingleChoiceQuestion> SingleChoiceQuestions { get; set; }
         public virtual ICollection<MultipleChoiceQuestion> MultipleChoiceQuestions { get; set; }
