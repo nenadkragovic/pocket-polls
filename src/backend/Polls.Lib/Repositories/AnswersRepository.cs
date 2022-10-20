@@ -14,7 +14,6 @@ namespace Polls.Lib.Repositories
             _context = context;
         }
 
-
         public async Task AddAnswers(Guid userId, long pollId, AddAnswersDto model)
         {
             _context.YesNoAnswers.AddRange(model.YesNoAnswers.Select(a => new YesNoAnswer()

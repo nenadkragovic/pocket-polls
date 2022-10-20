@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
@@ -9,6 +10,7 @@ namespace Polls.Api.Controllers;
 
 [ApiController]
 [Route("api/answers")]
+[Authorize]
 public class AnswersController : ControllerBase
 {
     private readonly AnswersRepository _answersRepository;

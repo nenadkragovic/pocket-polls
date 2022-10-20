@@ -34,4 +34,9 @@ namespace Polls.Lib.DTO
         [Required(ErrorMessage = "Password is required")]
         public string? Password { get; init; }
     }
+
+    public class TokenDto
+    {
+        public string Token { get; set; }
+    }
 }

@@ -36,6 +36,6 @@ public class UsersController : ControllerBase
         var result = await _repository.ValidateUserAsync(user);
         if (!result.Item1)
             return Unauthorized();
-        return Ok(new { Token = result.Item2 });
+        return Ok(new TokenDto { Token = result.Item2 });
     }
 }
