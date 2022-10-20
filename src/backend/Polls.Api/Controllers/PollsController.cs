@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
@@ -9,6 +10,7 @@ namespace Polls.Api.Controllers;
 
 [ApiController]
 [Route("api/polls")]
+[Authorize]
 public class PollsController : ControllerBase
 {
     private readonly PollsRepository _pollsRepository;
@@ -21,6 +23,7 @@ public class PollsController : ControllerBase
     [HttpGet]
     [ProducesResponseType(typeof(ICollection<LiustPollsDto>), 200)]
     [ProducesResponseType(204)]
+    [AllowAnonymous]
     public async Task<IActionResult> List([FromQuery] int offset = 0, [FromQuery] byte limit = 10, [FromQuery] string? searchParam = "")
     {
         var result = await _pollsRepository.ListPolls(offset, limit, searchParam ?? "");
@@ -52,7 +55,7 @@ public class PollsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var poll = await _pollsRepository.AddPoll(Context.ADMIN_ID, model);
+        var poll = await _pollsRepository.AddPoll(Context.GetAdminId(), model);
 
         return Created($"polls/{poll?.Id}", poll);
 

@@ -5,14 +5,16 @@ using Polls.Lib.Database.Models;
 
 namespace Polls.Lib.Database
 {
-    public class Context : IdentityDbContext
+    public class Context : IdentityDbContext<User, IdentityRole<Guid>, Guid, IdentityUserClaim<Guid>,
+                                             IdentityUserRole<Guid>, IdentityUserLogin<Guid>,
+                                             IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         private const string ADMIN_USERNAME = "Admin";
         private const string ADMIN_PASSWORD = "Admin";
         private const string ADMIN_EMAIL = "test@admin.com";
-        public const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
-        public const string ADMIN_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268f";
-        public const string USER_ROLE_ID = "0c68c99b-e95e-4247-8b71-4925c444268E";
+        private const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
+
+        //public virtual DbSet<IdentityUserClaim<string>> IdentityUserClaims { get; set; }
 
         public virtual DbSet<Poll> Polls { get; set; }
         public virtual DbSet<YesNoQuestion> YesNoQuestions { get; set; }
@@ -44,17 +46,21 @@ namespace Polls.Lib.Database
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            modelBuilder.Ignore<IdentityUserLogin<string>>();
-            modelBuilder.Ignore<IdentityUserRole<string>>();
-            modelBuilder.Ignore<IdentityUserClaim<string>>();
-            modelBuilder.Ignore<IdentityUserToken<string>>();
-            modelBuilder.Ignore<IdentityUser<string>>();
+            modelBuilder.Ignore<IdentityUserLogin<Guid>>();
+            modelBuilder.Ignore<IdentityUserRole<Guid>>();
+            modelBuilder.Ignore<IdentityUserClaim<Guid>>();
+            modelBuilder.Ignore<IdentityUserToken<Guid>>();
+            modelBuilder.Ignore<User>();
 
-            var hasher = new PasswordHasher<IdentityUser>();
+            var hasher = new PasswordHasher<User>();
 
-            modelBuilder.Entity<IdentityUser>().HasData(new IdentityUser()
+            modelBuilder.Entity<User>().HasData(new User()
             {
-                Id = ADMIN_ID,
+                Id = GetAdminId(),
+                FirstName = "Administrator",
+                LastName = "Administrator",
+                Address = "NO ADDRESS",
+                Role = Enums.Role.Admin,
                 UserName = ADMIN_USERNAME,
                 NormalizedUserName = ADMIN_USERNAME.ToUpperInvariant(),
                 Email = ADMIN_EMAIL,
@@ -62,15 +68,6 @@ namespace Polls.Lib.Database
                 PasswordHash = hasher.HashPassword(null, ADMIN_PASSWORD),
                 EmailConfirmed = true,
                 SecurityStamp = string.Empty
-            });
-
-            modelBuilder.Entity<IdentityRole>(entity =>
-            {
-                entity.HasData(new List<IdentityRole>()
-                {
-                    new IdentityRole() { Id = ADMIN_ROLE_ID, Name = "Admin", NormalizedName = "ADMIN" },
-                    new IdentityRole() { Id = USER_ROLE_ID, Name = "User", NormalizedName = "USER" }
-                });
             });
 
             modelBuilder.Entity<Poll>(entity =>
@@ -216,5 +213,7 @@ namespace Polls.Lib.Database
                     .HasConstraintName("FK_MultipleChoiceOption_MultipleChoiceQuestionsAnswer");
             });
         }
+
+        public static Guid GetAdminId() => Guid.Parse(ADMIN_ID);
     }
 }

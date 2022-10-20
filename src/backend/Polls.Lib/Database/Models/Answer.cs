@@ -11,12 +11,12 @@ namespace Polls.Lib.Database.Models
         /// <summary>
         /// Id of user that answerd questions
         /// </summary>
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public long QuestionId { get; set; }
         public QuestionType QuestionType { get; set; }
         public DateTime CreatedTime { get; set; } = DateTime.UtcNow;
 
-        public virtual IdentityUser User { get; set; }
+        public virtual User User { get; set; }
     }
 
     public class YesNoAnswer : Answer

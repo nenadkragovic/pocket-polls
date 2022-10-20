@@ -17,7 +17,7 @@ namespace Polls.Api.Tests
 
         private readonly TestServer _server;
         private readonly HttpClient _client;
-
+        private string Token = string.Empty;
 
         #region Shared Objects
 
@@ -98,6 +98,32 @@ namespace Polls.Api.Tests
             _client = application.CreateClient();
 
             _server = application.Server;
+
+            var response = _server.CreateRequest($"/api/users/examiner")
+                .And(x => x.Content =
+                    new StringContent(JsonConvert.SerializeObject(new CreateUserDto()
+                    {
+                        FirstName = "Joe",
+                        LastName = "Doe",
+                        Address = "Anytown, 1st street",
+                        Email = "joe.doe@mail.com",
+                        UserName = "joedoe",
+                        Password = "4rfvBGT%",
+                        PhoneNumber = "0631234567"
+                    }), Encoding.UTF8, "application/json"))
+                .PostAsync().Result;
+
+            response = _server.CreateRequest($"/api/users/login")
+                .And(x => x.Content =
+                    new StringContent(JsonConvert.SerializeObject(new CreateUserDto()
+                    {
+                        UserName = "joedoe",
+                        Password = "4rfvBGT%"
+                    }), Encoding.UTF8, "application/json"))
+                .PostAsync().Result;
+
+            var tokenDto = JsonConvert.DeserializeObject<TokenDto>(response.Content.ReadAsStringAsync().Result);
+            Token = tokenDto.Token;
         }
 
         #endregion
@@ -129,6 +155,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls/")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(createPollDto), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -146,6 +173,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(CreatePollWithAllQuestions), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -160,6 +188,7 @@ namespace Polls.Api.Tests
             response.StatusCode.Should().Be(HttpStatusCode.OK);
 
             response = await _server.CreateRequest($"/api/polls/{pollObject.Id}")
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .GetAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -205,11 +234,11 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls/{AddQuestionsPoll.Id}/questions")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(questions), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
         }
-
 
         [Fact]
         public async Task AddChoiceQuestionsWithoutChoicesShouldReturnBadRequest()
@@ -231,6 +260,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls/{AddQuestionsPoll.Id}/questions")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(questions), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -243,6 +273,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(CreatePollWithAllQuestions), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -278,6 +309,7 @@ namespace Polls.Api.Tests
             response = await _server.CreateRequest($"/api/polls/{pollObject.Id}/questions")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(questionsToDelete), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .SendAsync("DELETE");
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -289,6 +321,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(CreatePollWithAllQuestions), Encoding.UTF8, "application/json"))
+                 .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -298,6 +331,7 @@ namespace Polls.Api.Tests
             pollObject.Should().NotBeNull();
 
             response = await _server.CreateRequest($"/api/polls/{pollObject.Id}")
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .SendAsync("DELETE");
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -313,6 +347,7 @@ namespace Polls.Api.Tests
             var response = await _server.CreateRequest($"/api/polls")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(CreatePollWithAllQuestions), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.Created);
@@ -332,6 +367,7 @@ namespace Polls.Api.Tests
             response = await _server.CreateRequest($"/api/answers/{pollObject.Id}")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(model), Encoding.UTF8, "application/json"))
+                .AddHeader("Authorization", $"Bearer {Token}")
                 .PostAsync();
 
             response.StatusCode.Should().Be(HttpStatusCode.OK);

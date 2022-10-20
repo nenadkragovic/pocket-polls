@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
 using Polls.Lib.Repositories;
@@ -8,6 +10,7 @@ namespace Polls.Api.Controllers;
 
 [ApiController]
 [Route("api/answers")]
+[Authorize]
 public class AnswersController : ControllerBase
 {
     private readonly AnswersRepository _answersRepository;
@@ -40,7 +43,7 @@ public class AnswersController : ControllerBase
 
         try
         {
-            await _answersRepository.AddAnswers("1efc5e3a-283b-4b05-b1ea-d2cd424c59d4", pollId, model);
+            await _answersRepository.AddAnswers(Context.GetAdminId(), pollId, model);
 
             return Ok();
         }

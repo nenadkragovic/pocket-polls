@@ -14,8 +14,7 @@ namespace Polls.Lib.Repositories
             _context = context;
         }
 
-
-        public async Task AddAnswers(string userId, long pollId, AddAnswersDto model)
+        public async Task AddAnswers(Guid userId, long pollId, AddAnswersDto model)
         {
             _context.YesNoAnswers.AddRange(model.YesNoAnswers.Select(a => new YesNoAnswer()
             {
@@ -74,7 +73,7 @@ namespace Polls.Lib.Repositories
             return result;
         }
 
-        public async Task<GetAnswersDto> GetAnswersByPollIdForUser(long pollId, string userId)
+        public async Task<GetAnswersDto> GetAnswersByPollIdForUser(long pollId, Guid userId)
         {
             var result = new GetAnswersDto();
 
@@ -93,7 +92,7 @@ namespace Polls.Lib.Repositories
             return result;
         }
 
-        public async Task<GetAnswersDto> GetAnswersByPollIdForUsers(long pollId, ICollection<string> userIds)
+        public async Task<GetAnswersDto> GetAnswersByPollIdForUsers(long pollId, ICollection<Guid> userIds)
         {
             var result = new GetAnswersDto();
 
