@@ -1,9 +1,7 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
+using Polls.Lib.Repositories.Authentication;
+using System.Net;
 
 namespace Polls.Api.Controllers;
 
@@ -11,53 +9,33 @@ namespace Polls.Api.Controllers;
 [Route("api/users")]
 public class UsersController : ControllerBase
 {
-    private readonly UserManager<IdentityUser> _userManager;
-    private readonly SignInManager<IdentityUser> _signInManager;
+    private readonly IUserAuthenticationRepository _repository;
 
-    public UsersController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager)
+    public UsersController(IUserAuthenticationRepository repository)
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
+        _repository = repository;
     }
 
-    //[HttpGet("{pollId}")]
-    //[ProducesResponseType(typeof(Poll), 200)]
-    //[ProducesResponseType(204)]
-    //public async Task<IActionResult> Get([FromRoute] long pollId)
-    //{
-    //    var result = await _answersRepository.GetAnswersByPollId(pollId);
-
-    //    if (result != null)
-    //        return Ok(result);
-
-    //    return NoContent();
-    //}
-
-    [HttpPost]
-    [ProducesResponseType(201)]
-    [ProducesResponseType(400)]
-    [AllowAnonymous]
-    public async Task<IActionResult> CreateUser([FromBody] CreateUserDto model)
+    [HttpPost("respondent")]
+    public async Task<IActionResult> RegisterRespondent([FromBody] CreateUserDto userRegistration)
     {
-        if (!ModelState.IsValid)
-            return BadRequest();
+        var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.Respondent);
+        return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode((int)HttpStatusCode.Created);
+    }
 
-        var user = new IdentityUser
-        {
-            Id = Guid.NewGuid().ToString(),
-            UserName = model.UserName,
-            Email = model.Email,
-            PhoneNumber = model.PhoneNumber,
-        };
-        var result = await _userManager.CreateAsync(user, model.Password);
-        if (result.Succeeded)
-        {
-            //await _signInManager.SignInAsync(user, isPersistent: false);
+    [HttpPost("examiner")]
+    public async Task<IActionResult> RegisterExaminer([FromBody] CreateUserDto userRegistration)
+    {
+        var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.Examiner);
+        return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode((int)HttpStatusCode.Created);
+    }
 
-            return Created($"api/users/{user.Id}", user);
-        }
-
-        return BadRequest();
-
+    [HttpPost("login")]
+    public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
+    {
+        var result = await _repository.ValidateUserAsync(user);
+        if (!result.Item1)
+            return Unauthorized();
+        return Ok(new { Token = result.Item2 });
     }
 }

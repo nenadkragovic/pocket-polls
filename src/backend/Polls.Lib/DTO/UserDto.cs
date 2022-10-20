@@ -18,6 +18,20 @@ namespace Polls.Lib.DTO
 
         [Required]
         public string PhoneNumber { get; set; }
-        public string RoleId { get; set; }
+        [Required]
+        public string FirstName { get; set; }
+        [Required]
+        public string LastName { get; set; }
+        [Required]
+        public string Address { get; set; }
+    }
+
+    public class UserLoginDto
+    {
+        [Required(ErrorMessage = "Username is required")]
+        public string? UserName { get; init; }
+
+        [Required(ErrorMessage = "Password is required")]
+        public string? Password { get; init; }
     }
 }

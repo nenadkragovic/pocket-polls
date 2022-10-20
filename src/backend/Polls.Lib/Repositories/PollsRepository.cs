@@ -61,7 +61,7 @@ namespace Polls.Lib.Repositories
                 .AsNoTracking().FirstOrDefaultAsync(p => p.Id == pollId);
         }
 
-        public async Task<Poll?> AddPoll(string userId, CreatePollDto model)
+        public async Task<Poll?> AddPoll(Guid userId, CreatePollDto model)
         {
             var record = new Poll()
             {

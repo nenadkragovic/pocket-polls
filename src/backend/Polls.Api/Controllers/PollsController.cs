@@ -52,7 +52,7 @@ public class PollsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var poll = await _pollsRepository.AddPoll(Context.ADMIN_ID, model);
+        var poll = await _pollsRepository.AddPoll(Context.GetAdminId(), model);
 
         return Created($"polls/{poll?.Id}", poll);
 
