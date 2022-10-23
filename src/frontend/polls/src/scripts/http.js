@@ -1,9 +1,10 @@
 import axios from 'axios';
+const baseUrl ='https://localhost:7288/';
 
 export const httpRequest = async (url, method, data) => {
 	try {
 		const requestData = await axios({
-			url: url,
+			url: baseUrl + url,
 			method: method,
 			data: data,
 		});
@@ -15,7 +16,7 @@ export const httpRequest = async (url, method, data) => {
 export const httpRequestStartStopStrategy = async (url, method, data) => {
 	try {
 		const requestData = await axios({
-			url: url,
+			url: baseUrl + url,
 			headers: {
 				'Content-Type': 'application/json-patch+json',
 			},

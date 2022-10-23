@@ -6,8 +6,8 @@ import Poll from '../Poll/Poll';
 const Navigation = () => {
 	return (
 		<Routes>
-			<Route path='/' element={<Home/>} />
-			<Route path='/poll' element={<Poll/>} />
+			<Route path='/' element={<Home/>}/>
+			<Route path='/poll/:id' element={<Poll/>} />
 		</Routes>
 	);
 };

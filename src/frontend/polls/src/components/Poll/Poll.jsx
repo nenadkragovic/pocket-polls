@@ -1,13 +1,13 @@
 import React from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import './style/poll.scss';
 
-const Poll = () => {
-	console.log('home mounted');
+function Poll() {
+	const { id } = useParams();
 	return (
 		<ul className="navigationLinksList">
-			Poll component
-			<NavLink key="home" exact to={'/'} className="navigationLinksItem">
+			Poll  #{id}
+			<NavLink key="home" to={'/'} className="navigationLinksItem">
 				Home
 			</NavLink>
 		</ul>
