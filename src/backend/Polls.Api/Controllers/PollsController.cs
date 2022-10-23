@@ -37,6 +37,7 @@ public class PollsController : ControllerBase
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Poll), 200)]
     [ProducesResponseType(204)]
+    [AllowAnonymous]
     public async Task<IActionResult> Get([FromRoute] long id)
     {
         var result = await _pollsRepository.GetPollById(id);

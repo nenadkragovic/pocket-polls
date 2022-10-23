@@ -1,17 +1,19 @@
 import React, { Suspense } from 'react';
 import { BrowserRouter } from 'react-router-dom';
+import Footer from './components/Footer/Footer';
+import Header from './components/Header/Header';
+import Navigation from './components/Routes/Routes';
 import './App.css';
-import Routing from './components/Routes/Routes';
 
 function App() {
   return (
-    <div className="App">
-     	<BrowserRouter>
+    <BrowserRouter>
+			<Header />
 			<Suspense fallback={<div style={{ flex: 1 }}>Loading...</div>}>
-				<Routing />
+				<Navigation />
 			</Suspense>
+			{/* <Footer /> */}
 		</BrowserRouter>
-    </div>
   );
 }
 

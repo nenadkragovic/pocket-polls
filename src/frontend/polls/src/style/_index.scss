@@ -1,0 +1,37 @@
+// fonts
+@font-face {
+	font-family: 'Lato';
+	src: url('../assets/fonts/Lato-Black.ttf') format('truetype');
+}
+html,
+body {
+	margin: 0;
+	background-color: #212121;
+}
+#root {
+	font-family: 'Lato';
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	.contentWrapper {
+		flex: 1;
+	}
+	.homeLink {
+		z-index: 1;
+		position: absolute;
+		width: 200px;
+		height: 80px;
+		left: 50px;
+		top: 980px;
+
+		/* ActiveButton */
+
+		background: linear-gradient(180deg, #4ec299 0%, #3b9273 100%);
+		border-radius: 10px;
+		display: flex;
+		justify-content: center;
+		.backArrowImage {
+			width: 136px;
+		}
+	}
+}
