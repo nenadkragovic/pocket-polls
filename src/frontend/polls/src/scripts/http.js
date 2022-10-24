@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseUrl ='https://localhost:7288/';
+const baseUrl ='https://localhost:7288/api/';
 
 export const httpRequest = async (url, method, data) => {
 	try {
@@ -11,6 +11,7 @@ export const httpRequest = async (url, method, data) => {
 		return requestData;
 	} catch (error) {
 		console.log(error);
+		return null;
 	}
 };
 export const httpRequestStartStopStrategy = async (url, method, data) => {
@@ -26,5 +27,6 @@ export const httpRequestStartStopStrategy = async (url, method, data) => {
 		return requestData;
 	} catch (error) {
 		console.log(error);
+		return null;
 	}
 };
