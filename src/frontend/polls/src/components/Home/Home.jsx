@@ -37,7 +37,7 @@ const Home = () => {
 			requestInProgress: true
 		});
 		let offset = data.limit * (page-1);
-			await http.httpRequest("polls?offset=" + offset + "&limit=" + data.limit + "&searchParam=" + searchParam, 'GET', null)
+			await http.request("polls?offset=" + offset + "&limit=" + data.limit + "&searchParam=" + searchParam, 'GET', null)
 				.then(result => {
 					setData({
 						...data,
@@ -86,7 +86,7 @@ const Home = () => {
 				{ data.requestInProgress ?
 					<div>
 						{[...Array(data.limit)].map((x, i) =>
-							<div style={{height: '10rem', border: 0}} className="poll-thumb">
+							<div key={i} style={{height: '10rem', border: 0}} className="poll-thumb">
 								<Skeleton animation="wave"  style={{height: '2rem'}}/>
 								<Skeleton variant="rectangular" animation="wave" style={{height: '5rem'}}/>
 								<Skeleton variant="rectangular" animation="wave"  style={{height: '2rem', width: '5rem'}}/>

@@ -1,30 +1,18 @@
 import axios from 'axios';
 const baseUrl ='https://localhost:7288/api/';
 
-export const httpRequest = async (url, method, data) => {
+export const request = async (url, method, data) => {
 	try {
-		const requestData = await axios({
+		return await axios({
 			url: baseUrl + url,
 			method: method,
 			data: data,
-		});
-		return requestData;
-	} catch (error) {
-		console.log(error);
-		return null;
-	}
-};
-export const httpRequestStartStopStrategy = async (url, method, data) => {
-	try {
-		const requestData = await axios({
-			url: baseUrl + url,
+			timeout: 5000,
 			headers: {
 				'Content-Type': 'application/json-patch+json',
+				'Authorization': 'Bearer ' + localStorage.getItem('user-token')
 			},
-			method: method,
-			data: data,
 		});
-		return requestData;
 	} catch (error) {
 		console.log(error);
 		return null;

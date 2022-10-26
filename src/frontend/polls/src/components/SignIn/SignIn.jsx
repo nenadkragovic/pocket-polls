@@ -50,7 +50,7 @@ const SignIn = (props) => {
 	}
 
 	const logIn = async () => {
-		await http.httpRequest('users/login', 'POST', {
+		await http.request('users/login', 'POST', {
 				userName: data.username,
 				password: data.password
 			}).then(response => {
@@ -67,7 +67,7 @@ const SignIn = (props) => {
 	}
 
 	const register = async () => {
-		await http.httpRequest('users/register', 'POST', {
+		await http.request('users/register', 'POST', {
 			userName: data.username,
 			password: data.password,
 			email: data.email,

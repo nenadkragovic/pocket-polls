@@ -1,0 +1,21 @@
+.container {
+	width: 100%;
+    .poll-name {
+        font-size: 1.6rem;
+        margin-top: 1rem;
+    }
+    .progress {
+        height: 1rem;
+        margin-top: 1rem;
+    }
+    .buttons {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .question {
+        margin-top: 1rem;
+        height: 20rem;
+    }
+}
