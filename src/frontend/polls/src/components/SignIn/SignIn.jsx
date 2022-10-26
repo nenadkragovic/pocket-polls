@@ -1,5 +1,5 @@
 import React from 'react';
-import { useEffect, useState }from 'react';
+import { useState }from 'react';
 import './style/signIn.scss';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 const SignIn = (props) => {
 	const navigate = useNavigate();
 
-	const [data, setData] = useState({
+	let initData = {
 		logInOrSignIn: true,
 		showPassword: false,
 		username: '',
@@ -28,7 +28,8 @@ const SignIn = (props) => {
 		phoneNumber: '',
 		email: '',
 		address: ''
-	  });
+	  }
+	const [data, setData] = useState(initData);
 
 	const handleChange = (prop) => (event) => {
 		setData({ ...data, [prop]: event.target.value });
@@ -49,21 +50,37 @@ const SignIn = (props) => {
 	}
 
 	const logIn = async () => {
-		var response = await http.httpRequest('users/login', 'POST', {
-			userName: data.username,
-			password: data.password
-		})
+		await http.httpRequest('users/login', 'POST', {
+				userName: data.username,
+				password: data.password
+			}).then(response => {
+				if (response.status === 200 && response.data.token !== null)
+				{
+					localStorage.setItem('user-token', response.data.token);
+					props.isLoggedAction(true);
+					setData(initData);
+					navigate('/');
+				}
+			}).catch(err => {
 
-		if (response.status === 200 && response.data.token !== null)
-		{
-			localStorage.setItem('user-token', response.data.token);
-			props.isLoggedAction(true);
-			navigate('/');
-		}
+			})
 	}
 
-	const register = () => {
-		
+	const register = async () => {
+		await http.httpRequest('users/register', 'POST', {
+			userName: data.username,
+			password: data.password,
+			email: data.email,
+			fullName: data.fullName,
+			address: data.address
+		}).then(response => {
+			if (response.status === 201)
+			{
+				logIn();
+			}
+		}).catch(err => {
+
+		})
 	}
 
 	return (
@@ -170,7 +187,7 @@ const SignIn = (props) => {
 						/>
 					</FormControl>
 					<FormControl className="form-control">
-						<Button variant="contained">Register</Button>
+						<Button variant="contained" onClick={register}>Register</Button>
 					</FormControl>
 					<FormControl className="form-control">
 						<FormLabel variant="contained" onClick={constSwitchForms}>Already have account? Log in.</FormLabel>

@@ -12,7 +12,7 @@ import './App.css';
 
 function App() {
 
-  const [userLogged, setUserLogged] = useState(false);
+  const [userLogged, setUserLogged] = useState(localStorage.getItem('user-token') != null);
   useEffect(() => {}, []);
 
   const isLoggedAction = (logged) => {
