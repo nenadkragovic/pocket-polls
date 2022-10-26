@@ -16,19 +16,13 @@ public class UsersController : ControllerBase
         _repository = repository;
     }
 
-    [HttpPost("respondent")]
+    [HttpPost("register")]
     public async Task<IActionResult> RegisterRespondent([FromBody] CreateUserDto userRegistration)
     {
-        var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.Respondent);
+        var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.User);
         return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode((int)HttpStatusCode.Created);
     }
 
-    [HttpPost("examiner")]
-    public async Task<IActionResult> RegisterExaminer([FromBody] CreateUserDto userRegistration)
-    {
-        var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.Examiner);
-        return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode((int)HttpStatusCode.Created);
-    }
 
     [HttpPost("login")]
     public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)

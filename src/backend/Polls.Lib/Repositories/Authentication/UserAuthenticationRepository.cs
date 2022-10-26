@@ -21,6 +21,8 @@ namespace Polls.Lib.Repositories.Authentication
             _configuration = configuration;
         }
 
+        #region Public methods
+
         public async Task<IdentityResult> RegisterUserAsync(CreateUserDto userRegistration, Role role)
         {
             var user = new User
@@ -28,9 +30,7 @@ namespace Polls.Lib.Repositories.Authentication
                 Id = Guid.NewGuid(),
                 UserName = userRegistration.UserName,
                 Email = userRegistration.Email,
-                PhoneNumber = userRegistration.PhoneNumber,
-                FirstName = userRegistration.FirstName,
-                LastName = userRegistration.LastName,
+                FullName = userRegistration.FullName,
                 Address = userRegistration.Address,
                 Role = role
             };
@@ -53,6 +53,19 @@ namespace Polls.Lib.Repositories.Authentication
 
             return new Tuple<bool, string>(result, token);
         }
+        public Task<User> GetUserByName(string username)
+        {
+            return _userManager.FindByNameAsync(username);
+        }
+
+        public Task<User> GetUserById(Guid userId)
+        {
+            return _userManager.FindByIdAsync(userId.ToString());
+        }
+
+        #endregion
+
+        #region Private methods
 
         private async Task<string> CreateTokenAsync(User user)
         {
@@ -74,7 +87,8 @@ namespace Polls.Lib.Repositories.Authentication
         {
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName)
+                new Claim(ClaimTypes.Name, user.UserName),
+                new Claim(ClaimTypes.Role, user.Role.ToString())
             };
 
             claims.Add(new Claim(ClaimTypes.Role, user.Role.ToString()));
@@ -94,5 +108,7 @@ namespace Polls.Lib.Repositories.Authentication
             );
             return tokenOptions;
         }
+
+        #endregion
     }
 }

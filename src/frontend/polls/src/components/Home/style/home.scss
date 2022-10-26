@@ -1,0 +1,22 @@
+.container {
+	background-color: #f3f3f3;
+	width: 100%;
+	.search{
+		padding: 1rem;
+	}
+	.poll-thumb {
+		min-width: 275;
+		padding:1rem;
+		margin:1rem;
+	}
+	.pagination {
+		width: 100%;
+		display: inline-flex;
+		align-self: center;
+		justify-content: center;
+		margin-bottom: 1rem;
+	}
+	.no-polls-message{
+		justify-content: center;
+	}
+}

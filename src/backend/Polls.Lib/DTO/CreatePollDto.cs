@@ -9,8 +9,11 @@ namespace Polls.Lib.DTO
         [Required]
         public string Name { get; set; }
         public string Description { get; set; }
+        //public string ThumbImageUrl { get; set; }
         public DateTime StartDate { get; set; } = DateTime.MinValue;
         public DateTime EndDate { get; set; } = DateTime.MaxValue;
+        public string ThumbUrl { get; set; } = string.Empty;
+
         public ICollection<CreateQuestionDto>? Questions { get; set; }
 
     }

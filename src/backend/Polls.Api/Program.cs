@@ -18,12 +18,13 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Student Teacher API",
+        Title = "Polls API",
         Version = "v1",
-        Description = "Student Teacher API Services.",
+        Description = "Polls API Services.",
         Contact = new OpenApiContact
         {
-            Name = "Ajide Habeeb."
+            Name = "Nenad Kragovic",
+            Email = "nenadkragovic@gmail.com"
         },
     });
     c.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
@@ -61,6 +62,10 @@ builder.Services.ConfigureSqlContext(builder.Configuration);
 builder.Services.AddAuthentication();
 builder.Services.ConfigureIdentity();
 builder.Services.ConfigureJWT(builder.Configuration);
+builder.Services.AddCors(p => p.AddPolicy("cors", builder =>
+{
+    builder.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+}));
 
 builder.Services.AddAuthorization();
 
@@ -81,6 +86,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseCors("cors");
 
 app.UseStaticFiles(new StaticFileOptions
 {

@@ -2,8 +2,7 @@
 {
     public enum Role
     {
-        Respondent,
-        Examiner,
+        User,
         Admin
     }
 }

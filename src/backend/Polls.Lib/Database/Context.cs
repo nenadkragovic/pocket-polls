@@ -57,8 +57,7 @@ namespace Polls.Lib.Database
             modelBuilder.Entity<User>().HasData(new User()
             {
                 Id = GetAdminId(),
-                FirstName = "Administrator",
-                LastName = "Administrator",
+                FullName = "Administrator",
                 Address = "NO ADDRESS",
                 Role = Enums.Role.Admin,
                 UserName = ADMIN_USERNAME,
