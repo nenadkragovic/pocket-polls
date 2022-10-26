@@ -79,8 +79,8 @@ const ResponsiveAppBar = (props) => {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={page.name} onClick={handleCloseNavMenu}>
-                  <NavLink to={page.url} className="navigationLinksItem">
+                <MenuItem key={page.name} onClick={handleCloseNavMenu}  style={{ textDecoration: 'none'}}>
+                  <NavLink to={page.url} className="navigationLinksItem"  style={{ textDecoration: 'none'}}>
                     <Typography textAlign="center">{page.name}</Typography>
                   </NavLink>
                 </MenuItem>
@@ -90,7 +90,7 @@ const ResponsiveAppBar = (props) => {
           <PollIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <NavLink key={page.name} to={page.url} className="navigationLinksItem">
+              <NavLink key={page.name} to={page.url} className="navigationLinksItem"  style={{ textDecoration: 'none', marginRight: '1rem' }}>
                 <Typography textAlign="center">{page.name}</Typography>
               </NavLink>
             ))}
