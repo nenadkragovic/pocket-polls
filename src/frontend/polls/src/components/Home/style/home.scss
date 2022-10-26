@@ -1,13 +1,28 @@
 .container {
-	background-color: #f3f3f3;
 	width: 100%;
 	.search{
 		padding: 1rem;
 	}
+
 	.poll-thumb {
 		min-width: 275;
 		padding:1rem;
 		margin:1rem;
+		border: 0px;
+		box-sizing: border-box;
+		border-radius: 1rem;
+		border: 1px solid black;
+		.card-actions {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+		.answer-poll-button {
+			// box-sizing: border-box;
+			// border-radius: 1rem;
+			// width: 7rem;
+			// align-self: flex-end;
+		}
 	}
 	.pagination {
 		width: 100%;

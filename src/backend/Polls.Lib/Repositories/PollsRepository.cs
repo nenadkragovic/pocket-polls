@@ -37,7 +37,12 @@ namespace Polls.Lib.Repositories
                     Id = p.Id,
                     Name = p.Name,
                     Description = p.Description,
-                    ThumbUrl = p.ThumbUrl
+                    ThumbUrl = p.ThumbUrl,
+                    NumberOfQuestions =
+                        p.MultipleChoiceQuestions.Count() +
+                        p.SingleChoiceQuestions.Count() +
+                        p.TextQuestions.Count() +
+                        p.YesNoQuestions.Count()
                 })
                 .ToListAsync();
 
