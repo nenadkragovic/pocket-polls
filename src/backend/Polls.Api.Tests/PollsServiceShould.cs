@@ -99,17 +99,15 @@ namespace Polls.Api.Tests
 
             _server = application.Server;
 
-            var response = _server.CreateRequest($"/api/users/examiner")
+            var response = _server.CreateRequest($"/api/users/register")
                 .And(x => x.Content =
                     new StringContent(JsonConvert.SerializeObject(new CreateUserDto()
                     {
-                        FirstName = "Joe",
-                        LastName = "Doe",
+                        FullName = "Joe Doe",
                         Address = "Anytown, 1st street",
                         Email = "joe.doe@mail.com",
                         UserName = "joedoe",
                         Password = "4rfvBGT%",
-                        PhoneNumber = "0631234567"
                     }), Encoding.UTF8, "application/json"))
                 .PostAsync().Result;
 

@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
 using Polls.Lib.Exceptions;
 using Polls.Lib.Repositories;
+using Polls.Lib.Repositories.Authentication;
+using System.Security.Claims;
 
 namespace Polls.Api.Controllers;
 
@@ -14,14 +17,18 @@ namespace Polls.Api.Controllers;
 public class PollsController : ControllerBase
 {
     private readonly PollsRepository _pollsRepository;
+    private readonly IUserAuthenticationRepository _userAuthenticationRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public PollsController(PollsRepository pollsRepository)
+    public PollsController(PollsRepository pollsRepository, IUserAuthenticationRepository userAuthenticationRepository, IHttpContextAccessor httpContextAccessor)
     {
         _pollsRepository = pollsRepository;
+        _userAuthenticationRepository = userAuthenticationRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet]
-    [ProducesResponseType(typeof(ICollection<LiustPollsDto>), 200)]
+    [ProducesResponseType(typeof(ICollection<ListPollsDto>), 200)]
     [ProducesResponseType(204)]
     [AllowAnonymous]
     public async Task<IActionResult> List([FromQuery] int offset = 0, [FromQuery] byte limit = 10, [FromQuery] string? searchParam = "")
@@ -56,7 +63,11 @@ public class PollsController : ControllerBase
         if (!ModelState.IsValid)
             return BadRequest();
 
-        var poll = await _pollsRepository.AddPoll(Context.GetAdminId(), model);
+        var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+        var user = await _userAuthenticationRepository.GetUserByName(username);
+
+        var poll = await _pollsRepository.AddPoll(user.Id, model);
 
         return Created($"polls/{poll?.Id}", poll);
 

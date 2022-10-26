@@ -1,18 +1,42 @@
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import Footer from './components/Footer/Footer';
-import Header from './components/Header/Header';
-import Navigation from './components/Routes/Routes';
+import Menu from './components/Menu/Menu.jsx'
+import { Routes, Route } from 'react-router-dom';
+import Answers from './components/Answers/Answers';
+import CreatePoll from './components/CreatePoll/CreatePoll';
+import Home from './components/Home/Home';
+import Poll from './components/Poll/Poll';
+import Profile from './components/Profile/Profile';
+import SignIn from './components/SignIn/SignIn';
 import './App.css';
 
 function App() {
+
+  const [userLogged, setUserLogged] = useState(false);
+  useEffect(() => {}, []);
+
+  const isLoggedAction = (logged) => {
+    setUserLogged(logged);
+  };
+
   return (
     <BrowserRouter>
-			<Header />
-			<Suspense fallback={<div style={{ flex: 1 }}>Loading...</div>}>
-				<Navigation />
-			</Suspense>
-			{/* <Footer /> */}
+      {
+        userLogged ?
+          <div>
+            <Menu isLoggedAction={isLoggedAction} />
+            <Suspense fallback={<div style={{ flex: 1 }}>Loading...</div>}>
+            <Routes>
+              <Route path='/' element={<Home/>}/>
+              <Route path='/poll/:id' element={<Poll/>} />
+              <Route path='/signin' element={<SignIn/>} />
+              <Route path='/answers' element={<Answers/>} />
+              <Route path='/createpoll' element={<CreatePoll/>} />
+              <Route path='/profile' element={<Profile/>} />
+            </Routes>
+            </Suspense>
+          </div> : <SignIn isLoggedAction={isLoggedAction}/>
+      }
 		</BrowserRouter>
   );
 }

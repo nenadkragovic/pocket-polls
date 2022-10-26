@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
 using Polls.Lib.Enums;
 using Polls.Lib.Exceptions;
+using static Microsoft.Extensions.Logging.EventSource.LoggingEventSource;
 
 namespace Polls.Lib.Repositories
 {
@@ -17,28 +19,29 @@ namespace Polls.Lib.Repositories
         }
 
         #region Public Methods
-        public async Task<ListResult<LiustPollsDto>> ListPolls(int offset, int limit, string searchParam = "")
+        public async Task<ListResult<ListPollsDto>> ListPolls([FromQuery] int offset, [FromQuery] int limit, [FromQuery] string searchParam = "")
         {
-            var query = _context.Polls.AsNoTracking();
+            var query = _context.Polls.AsNoTracking(); //.Where(p => p.StartDate <= DateTime.UtcNow && p.EndDate >= DateTime.UtcNow);
 
             if (!string.IsNullOrEmpty(searchParam))
             {
-                query = query.Where(p => p.Name.ToLower().Contains(searchParam.ToLower().Trim()));
+                query = query.Where(p => p.Name.Contains(searchParam.Trim()));
             }
 
             int total = await query.AsNoTracking().CountAsync();
 
             var records = await _context.Polls
                 .Skip(offset).Take(limit)
-                .Select(p => new LiustPollsDto()
+                .Select(p => new ListPollsDto()
                 {
                     Id = p.Id,
                     Name = p.Name,
-                    Description = p.Description
+                    Description = p.Description,
+                    ThumbUrl = p.ThumbUrl
                 })
                 .ToListAsync();
 
-            return new ListResult<LiustPollsDto>()
+            return new ListResult<ListPollsDto>()
             {
                 Records = records,
                 TotalRecords = total
@@ -69,7 +72,8 @@ namespace Polls.Lib.Repositories
                 Name = model.Name,
                 Description = model.Description,
                 StartDate = model.StartDate,
-                EndDate = model.EndDate
+                EndDate = model.EndDate,
+                ThumbUrl = model.ThumbUrl
             };
 
             if (model.Questions != null)
