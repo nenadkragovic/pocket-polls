@@ -33,7 +33,7 @@ function Poll() {
 					...answers,
 					questions: questions,
 					numberOfQuestions: questions.length,
-					progress: 0
+					progress: 1 / questions.length * 100
 				})
 			})
 			.catch(err => {
@@ -41,23 +41,26 @@ function Poll() {
 	}, []);
 
 	const nextQuestion = () => {
-		let completed = answers.currentQuestion >= (answers.numberOfQuestions - 1)
+		let nextQuestion = answers.currentQuestion < (answers.numberOfQuestions - 1) ? (1 + answers.currentQuestion) : answers.currentQuestion;
+		let completed = nextQuestion == (answers.numberOfQuestions - 1);
+		let progress = (1 + nextQuestion) / answers.numberOfQuestions * 100;
 		setAnswers({
 			...answers,
-			currentQuestion: completed ? answers.currentQuestion : (1 + answers.currentQuestion),
+			currentQuestion: nextQuestion,
 			completed: completed,
-			progress: (answers.currentQuestion > 0 ? ((1 + answers.currentQuestion)) : 1)/ answers.numberOfQuestions * 100
+			progress: progress
 		})
 		console.log(answers.currentQuestion);
 	}
 
 	const prevQuestion = () => {
+		let nextQuestion = answers.currentQuestion > 0 ? (answers.currentQuestion - 1) : 0;
+		let progress = (1 + nextQuestion) / answers.numberOfQuestions * 100;
 		setAnswers({
 			...answers,
-			currentQuestion: (answers.currentQuestion - 1) > 0 ? (answers.currentQuestion - 1) : 0,
-			progress: (answers.currentQuestion > 0 ? ((1 + answers.currentQuestion)) : 1)/ answers.numberOfQuestions * 100
+			currentQuestion: nextQuestion,
+			progress: progress
 		})
-		console.log(answers.currentQuestion);
 	}
 
 	function Question(props) {
