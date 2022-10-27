@@ -8,16 +8,38 @@ import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
 import Button from '@mui/material/Button';
+import Switch from '@mui/material/Switch';
+import TextareaAutosize from '@mui/material/TextareaAutosize';
+import Radio from '@mui/material/Radio';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormControl from '@mui/material/FormControl';
+import FormGroup from '@mui/material/FormGroup';
+import Checkbox from '@mui/material/Checkbox';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 function Poll() {
+	const QuestionType = {
+		YesNo: 0,
+		SingleChoice: 1,
+		MultipleChoice: 2,
+		Text: 3
+	}
 	const { id } = useParams();
 	const [poll, setPoll] = useState({});
-	const [answers, setAnswers] = useState({
+	const [questionsData, setQuestionsData] = useState({
 		questions: [],
 		progress: 50,
 		currentQuestion: 0,
 		numberOfQuestions: 0,
 		completed: false
+	});
+	const [answers, setAnswers] = useState({
+		yesNoAnswers: [],
+		singleChoiceAnswers: [],
+		multipleChoiceAnswers: [],
+		textAnswers: [],
 	});
 
 	useEffect(() => {
@@ -25,73 +47,233 @@ function Poll() {
 			.then(result => {
 				setPoll(result.data);
 				let questions = [];
-				result.data.yesNoQuestions.map((item) => questions.push(item));
-				result.data.singleChoiceQuestions.map((item) => questions.push(item));
-				result.data.textQuestions.map((item) => questions.push(item));
-				result.data.multipleChoiceQuestions.map((item) => questions.push(item));
-				setAnswers({
-					...answers,
+				let yesNoAnswers =[];
+				let singleChoiceAnswers = [];
+				let multipleChoiceAnswers = [];
+				let textAnswers = [];
+
+				result.data.yesNoQuestions.map((item) => {
+					questions.push(item);
+					yesNoAnswers.push({
+						questionId: item.id,
+						answer: false
+					});
+				});
+				result.data.singleChoiceQuestions.map((item) => {
+					questions.push(item);
+					singleChoiceAnswers.push({
+						questionId: item.id,
+						choiceId: item.choices[0].id
+					});
+				});
+				result.data.multipleChoiceQuestions.map((item) => {
+					questions.push(item);
+					multipleChoiceAnswers.push({
+						questionId: item.id,
+						choiceIds: []
+					});
+				});
+				result.data.textQuestions.map((item) => {
+					questions.push(item);
+					textAnswers.push({
+						questionId: item.id,
+						answer: ''
+					});
+				});
+
+				setQuestionsData({
+					...questionsData,
 					questions: questions,
 					numberOfQuestions: questions.length,
 					progress: 1 / questions.length * 100
 				})
+
+				setAnswers({
+					yesNoAnswers: yesNoAnswers,
+					singleChoiceAnswers: singleChoiceAnswers,
+					multipleChoiceAnswers: multipleChoiceAnswers,
+					textAnswers: textAnswers
+				});
 			})
 			.catch(err => {
 			});
 	}, []);
 
 	const nextQuestion = () => {
-		let nextQuestion = answers.currentQuestion < (answers.numberOfQuestions - 1) ? (1 + answers.currentQuestion) : answers.currentQuestion;
-		let completed = nextQuestion == (answers.numberOfQuestions - 1);
-		let progress = (1 + nextQuestion) / answers.numberOfQuestions * 100;
-		setAnswers({
-			...answers,
+		let nextQuestion = questionsData.currentQuestion < (questionsData.numberOfQuestions - 1) ?
+			(1 + questionsData.currentQuestion) : questionsData.currentQuestion;
+		let completed = nextQuestion == (questionsData.numberOfQuestions - 1);
+		let progress = (1 + nextQuestion) / questionsData.numberOfQuestions * 100;
+		setQuestionsData({
+			...questionsData,
 			currentQuestion: nextQuestion,
 			completed: completed,
 			progress: progress
 		})
-		console.log(answers.currentQuestion);
 	}
 
 	const prevQuestion = () => {
-		let nextQuestion = answers.currentQuestion > 0 ? (answers.currentQuestion - 1) : 0;
-		let progress = (1 + nextQuestion) / answers.numberOfQuestions * 100;
-		setAnswers({
-			...answers,
+		let nextQuestion = questionsData.currentQuestion > 0 ? (questionsData.currentQuestion - 1) : 0;
+		let progress = (1 + nextQuestion) / questionsData.numberOfQuestions * 100;
+		let completed = nextQuestion == (questionsData.numberOfQuestions - 1);
+		setQuestionsData({
+			...questionsData,
 			currentQuestion: nextQuestion,
-			progress: progress
+			progress: progress,
+			completed: completed
 		})
+	}
+
+	const submit = () => {
+		console.log(answers);
+
+		http.request('answers/' + poll.id, 'POST', answers)
+			.then(result => {
+				console.log(result);
+			})
+			.catch(err => {
+				console.log(err);
+			});
+	}
+
+	const getYesNoAnswer = (questionId) => {
+		let objIndex = answers.yesNoAnswers.findIndex((obj => obj.questionId === questionId));
+		return answers.yesNoAnswers[objIndex].answer;
+	}
+
+	const setYesNoAnswer = (questionId, value) => {
+		setAnswers(prevState => {
+			let objIndex = prevState.yesNoAnswers.findIndex((obj => obj.questionId === questionId));
+			let arr = prevState.yesNoAnswers;
+			arr[objIndex].answer = value;
+			return {
+				 ...prevState,
+				 yesNoAnswers: arr
+			}
+		 })
+	}
+
+	const getSingleChoiceAnswer = (questionId) => {
+		let objIndex = answers.singleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
+		return answers.singleChoiceAnswers[objIndex].choiceId;
+	}
+	const setSingleChoiceAnswer = (questionId, choiceId) => {
+		console.log(choiceId);
+		setAnswers(prevState => {
+			let objIndex = prevState.singleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
+			let arr = prevState.singleChoiceAnswers;
+			arr[objIndex].choiceId = choiceId;
+			return {
+				 ...prevState,
+				 singleChoiceAnswers: arr
+			}
+		 })
+	}
+
+	const getMultipleChoiceStatus = (questionId, choiceId) => {
+		let objIndex = answers.multipleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
+		return answers.multipleChoiceAnswers[objIndex]?.choiceIds.includes(choiceId);
+	}
+
+	const setMultipleChoiceStatus = (questionId, choiceId, add) => {
+		console.log(choiceId);
+		setAnswers(prevState => {
+			let objIndex = prevState.multipleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
+			let arr = prevState.multipleChoiceAnswers;
+			add ? arr[objIndex].choiceIds.push(choiceId) : (arr[objIndex].choiceIds = arr[objIndex].choiceIds.filter(function(value, index, arr){
+				return value !== choiceId;
+			}));
+
+			return {
+				 ...prevState,
+				 multipleChoiceAnswers: arr
+			}
+		 })
+	}
+
+	const getTextAnswer = (questionId) => {
+		let objIndex = answers.textAnswers.findIndex((obj => obj.questionId === questionId));
+		return answers.textAnswers[objIndex].answer;
+	}
+
+	const setTextAnswer = (questionId, value) => {
+		setAnswers(prevState => {
+			let objIndex = prevState.yesNoAnswers.findIndex((obj => obj.questionId === questionId));
+			let arr = prevState.textAnswers;
+			arr[objIndex].answer = value;
+			return {
+				 ...prevState,
+				 textAnswers: arr
+			}
+		 })
 	}
 
 	function Question(props) {
 		switch(props.question.questionType) {
-		  case 0:
-			return <p>YesNoQuestion</p>
-		  case 1:
-			return <p>SingleChoice</p>
-		  case 2:
-			return <p>MultipleChoice</p>
+		  case QuestionType.YesNo:
+			return <div className='answer'>No <Switch checked={getYesNoAnswer(props.question.id)} onChange={(e) => setYesNoAnswer(props.question.id, e.target.checked)}/> Yes </div>
+		  case QuestionType.SingleChoice:
+			return <FormControl>
+						<RadioGroup
+							aria-labelledby="demo-radio-buttons-group-label"
+							defaultValue={props.question.choices[0].name}
+							name="radio-buttons-group"
+							value = {getSingleChoiceAnswer(props.question.id)}
+							onChange={(e) => setSingleChoiceAnswer(props.question.id, e.target.value)}
+						>
+							{
+								props.question.choices.map((choice) => (
+									<FormControlLabel key={choice.id} value={choice.id} control={<Radio />} label={choice.name} />
+								))
+							}
+					</RadioGroup>
+				</FormControl>
+		  case QuestionType.MultipleChoice:
+			return <FormGroup>
+					{
+						props.question.choices.map((choice) => (
+							<FormControlLabel key={choice.id} value={choice.id} label={choice.name}
+								control={<Checkbox
+											checked={getMultipleChoiceStatus(props.question.id, choice.id)}
+											onChange={(e) => setMultipleChoiceStatus(props.question.id, choice.id, e.target.checked)}
+											/>}  />
+						))
+					}
+				   </FormGroup>
 		  default:
-			return <p>Text question</p>
+			return <div className='answer'>
+						<TextareaAutosize
+							value = {getTextAnswer(props.question.id)}
+							onChange = {(e) => { e.preventDefault(); setTextAnswer(props.question.id, e.target.value)}}
+							aria-label="Write your answer"
+							minRows={3}
+							placeholder=""
+							style={{ width: '100%', maxHeight: '20rem', height: '10rem' }}
+						/>
+					</div>
 		}
 	}
 	return (
 		<Container style={style} className="container">
 			<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
 			{
-				answers.numberOfQuestions > 0 ?
+				questionsData.numberOfQuestions > 0 ?
 					<div>
-						<LinearProgress className="progress" variant="determinate" value={answers.progress} />
+						<LinearProgress className="progress" variant="determinate" value={questionsData.progress} />
+						<Typography className="questionText" textAlign="center">({questionsData.currentQuestion + 1}/{questionsData.numberOfQuestions})</Typography>
 						<Box className="question">
-							<Typography className="questionText" textAlign="left">#{answers.currentQuestion}</Typography>
-							<Typography className="questionText" textAlign="center">{answers.questions[answers.currentQuestion].questionText}</Typography>
-							<Question question={answers.questions[answers.currentQuestion]}></Question>
+							<Typography className="questionText" textAlign="center">{questionsData.questions[questionsData.currentQuestion].questionText}</Typography>
+							<Question question={questionsData.questions[questionsData.currentQuestion]}></Question>
 						</Box>
 						<Box className="buttons">
-						<Button variant="outlined" onClick={prevQuestion}>Previous</Button>
-						<Button variant="outlined" onClick={nextQuestion}>Next</Button>
-					</Box>
-					</div>:
+							<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
+							{
+								questionsData.completed ?
+								<Button variant="outlined" onClick={submit}>Submit</Button> :
+								<Button variant="outlined" onClick={nextQuestion}><ArrowForwardIcon></ArrowForwardIcon></Button>
+							}
+						</Box>
+					</div> :
 					<Box className="question">
 						<Typography className="questionText" textAlign="center">No questions</Typography>
 					</Box>

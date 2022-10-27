@@ -1,5 +1,9 @@
 .container {
 	width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     .poll-name {
         font-size: 1.6rem;
         margin-top: 1rem;
@@ -9,13 +13,20 @@
         margin-top: 1rem;
     }
     .buttons {
+        margin-top: 2rem;
+        width: 100%;
         position: relative;
         display: flex;
+        align-self: flex-end;
         align-items: center;
         justify-content: space-between;
     }
     .question {
         margin-top: 1rem;
-        height: 20rem;
+    }
+    .answer {
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
