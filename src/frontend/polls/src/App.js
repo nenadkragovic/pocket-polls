@@ -23,7 +23,7 @@ function App() {
     <BrowserRouter>
       {
         userLogged ?
-          <div>
+          <>
             <Menu isLoggedAction={isLoggedAction} />
             <Suspense fallback={<div style={{ flex: 1 }}>Loading...</div>}>
             <Routes>
@@ -35,7 +35,7 @@ function App() {
               <Route path='/profile' element={<Profile/>} />
             </Routes>
             </Suspense>
-          </div> : <SignIn isLoggedAction={isLoggedAction}/>
+          </> : <SignIn isLoggedAction={isLoggedAction}/>
       }
 		</BrowserRouter>
   );

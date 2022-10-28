@@ -206,6 +206,7 @@ function Poll() {
 				 textAnswers: arr
 			}
 		 })
+		 console.log(answers)
 	}
 
 	function Question(props) {
@@ -243,8 +244,8 @@ function Poll() {
 		  default:
 			return <div className='answer'>
 						<TextareaAutosize
-							value = {getTextAnswer(props.question.id)}
-							onChange = {(e) => { e.preventDefault(); setTextAnswer(props.question.id, e.target.value)}}
+							defaultValue = {getTextAnswer(props.question.id)}
+							onBlur= {(e) => {setTextAnswer(props.question.id, e.target.value)}}
 							aria-label="Write your answer"
 							minRows={3}
 							placeholder=""
@@ -255,26 +256,29 @@ function Poll() {
 	}
 	return (
 		<Container style={style} className="container">
-			<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
 			{
 				questionsData.numberOfQuestions > 0 ?
-					<div>
-						<LinearProgress className="progress" variant="determinate" value={questionsData.progress} />
-						<Typography className="questionText" textAlign="center">({questionsData.currentQuestion + 1}/{questionsData.numberOfQuestions})</Typography>
-						<Box className="question">
+				<>
+						<div className='progress-box'>
+							<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
+							<LinearProgress className="progress" variant="determinate" value={questionsData.progress} />
+							<Typography className="questionText" textAlign="center">({questionsData.currentQuestion + 1}/{questionsData.numberOfQuestions})</Typography>
+						</div>
+						<div className="question">
 							<Typography className="questionText" textAlign="center">{questionsData.questions[questionsData.currentQuestion].questionText}</Typography>
 							<Question question={questionsData.questions[questionsData.currentQuestion]}></Question>
-						</Box>
-						<Box className="buttons">
+						</div>
+						<div className="buttons">
 							<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
 							{
 								questionsData.completed ?
 								<Button variant="outlined" onClick={submit}>Submit</Button> :
 								<Button variant="outlined" onClick={nextQuestion}><ArrowForwardIcon></ArrowForwardIcon></Button>
 							}
-						</Box>
-					</div> :
+						</div>
+					</> :
 					<Box className="question">
+						<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
 						<Typography className="questionText" textAlign="center">No questions</Typography>
 					</Box>
 			}

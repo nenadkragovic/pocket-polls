@@ -29,7 +29,14 @@ const Home = () => {
 
 	useEffect(() => {
 		fetchData(1);
+		// testPushMessage();
 	},[]);
+
+	// const testPushMessage = () => {
+	// 	global.registration.showNotification('Test Message', {
+	// 	  body: 'Success!'
+	// 	})
+	//   }
 
 	const fetchData = async (page, searchParam = '') => {
 		setData({
@@ -82,7 +89,7 @@ const Home = () => {
 				options={[]}
 				renderInput={(params) => <TextField {...params} label="Search" onChange={searchPolls} />}
 			/>
-			<List style={{maxHeight: '100%', overflow: 'auto'}} className="poll-thumbs-list">
+			<List className="poll-thumbs-list">
 				{ data.requestInProgress ?
 					<div>
 						{[...Array(data.limit)].map((x, i) =>
@@ -119,7 +126,7 @@ const Home = () => {
 				data.items.length > 0 ?
 					<Pagination
 					className='pagination'
-					count={data.totalRecords/data.limit}
+					count={Math.round(data.totalRecords/data.limit)}
 					size="large"
 					onChange={handleChange}
 					/> : null
