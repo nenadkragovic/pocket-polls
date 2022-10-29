@@ -115,3 +115,4 @@ dist
 /src/backend/Polls.Api/bin
 bin
 obj
+/publish

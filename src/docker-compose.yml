@@ -1,0 +1,54 @@
+version: '3.4'
+
+services:
+ sql-server:
+    container_name: sql-server-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./docker-data/mssql:/var/opt/mssql
+    environment:
+      SA_PASSWORD: "5tgbNHY^"
+      ACCEPT_EULA: "Y"
+ rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+      - "35197:35197"
+    volumes:
+      - ./data:/var/lib/rabbitmq
+      - ./data/logs:/var/log/rabbitmq
+    hostname: rabbit
+    environment:
+      - RABBIT_DEFAULT_USER="admin"
+      - RABBIT_DEFAULT_PASS="5tgbNHY^"
+ polls-api:
+    image: polls-api
+    build:
+      context: backend/Polls.Api
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
+ polls-grpc:
+    image: polls-grpc
+    build:
+      context: backend/Polls.gRPC
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
+ polls-gui:
+    image: polls-gui
+    build:
+      context: frontend/
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
+volumes:
+  data:

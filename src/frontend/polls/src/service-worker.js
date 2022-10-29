@@ -69,4 +69,19 @@ self.addEventListener('message', (event) => {
   }
 });
 
+self.addEventListener('fetch', (event) => {
+  if (event.request.mode === 'navigate') {
+    event.respondWith(caches.match('/index.html'));
+  } else {
+    // Your other response logic goes here.
+  }
+});
+
 // Any other custom service worker logic can go here.
+
+self.addEventListener('push', event => {
+  event.waitUntil(self.registration.showNotification('Todo List', {
+    icon: '/icon-120.png',
+    body: event.data.text()
+  }))
+})

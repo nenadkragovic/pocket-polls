@@ -10,6 +10,21 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
 
+export const urlB64ToUint8Array = (base64String) => {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding)
+    .replace(/\-/g, '+')
+    .replace(/_/g, '/');
+
+  const rawData = window.atob(base64);
+  const outputArray = new Uint8Array(rawData.length);
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i);
+  }
+  return outputArray;
+}
+
 const isLocalhost = Boolean(
   window.location.hostname === 'localhost' ||
     // [::1] is the IPv6 localhost address.
@@ -19,7 +34,7 @@ const isLocalhost = Boolean(
 );
 
 export function register(config) {
-  if (process.env.NODE_ENV === 'production' && 'serviceWorker' in navigator) {
+  if ('serviceWorker' in navigator) {
     // The URL constructor is available in all browsers that support SW.
     const publicUrl = new URL(process.env.PUBLIC_URL, window.location.href);
     if (publicUrl.origin !== window.location.origin) {
@@ -53,9 +68,28 @@ export function register(config) {
 }
 
 function registerValidSW(swUrl, config) {
+  console.log('uso u warn');
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
+      console.warn('Service worker registred successfully!');
+
+      const key = "BDk-kDxLswQMajg9TJqpb9VFTjQeQmS0FE_rTVJ4f9G-v9GFkzcDt-vYkvz5dVkbCfrGmJeLTbvuNUKpOUojWB4";
+      registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlB64ToUint8Array(key)
+      }).then(sub => {
+        console.log("Subscribed!")
+      }).catch(err => {
+        console.log("Did not subscribe.")
+      });
+
+      setTimeout(() => {
+        registration.showNotification('Test Message', {
+          body: 'Success!'
+        })
+      }, 4000);
+
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -105,17 +139,17 @@ function checkValidServiceWorker(swUrl, config) {
       // Ensure service worker exists, and that we really are getting a JS file.
       const contentType = response.headers.get('content-type');
       if (
-        response.status === 404 ||
-        (contentType != null && contentType.indexOf('javascript') === -1)
+        response.status === 404
+        || (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
-        // No service worker found. Probably a different app. Reload the page.
+        console.warn('No service worker found. Probably a different app. Reload the page.');
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
             window.location.reload();
           });
         });
       } else {
-        // Service worker found. Proceed as normal.
+        console.info('Service worker found. Proceed as normal.')
         registerValidSW(swUrl, config);
       }
     })

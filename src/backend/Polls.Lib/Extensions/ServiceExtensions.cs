@@ -21,7 +21,7 @@ namespace Polls.Lib.Extensions
             if (configuration["InMemoryDatabase"] == null || !Boolean.Parse(configuration["InMemoryDatabase"]))
             {
                 services.AddDbContext<Context>(options =>
-                    options.UseSqlServer(configuration.GetConnectionString("PlatformDb"), sqlOptions =>
+                    options.UseSqlServer(configuration.GetConnectionString("PollsDb"), sqlOptions =>
                     {
                         sqlOptions.MigrationsAssembly(typeof(Context).Assembly.GetName().Name);
                     }), ServiceLifetime.Transient);

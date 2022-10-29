@@ -16,3 +16,8 @@ React PWA playground
 
 
 ## Sources
+
+TODO:
+- notification permission
+- open grpc chanel from service worker
+- add rabbit to api and grpc service
