@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Polls.Api.MessageBrokers;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
@@ -19,12 +20,17 @@ public class PollsController : ControllerBase
     private readonly PollsRepository _pollsRepository;
     private readonly IUserAuthenticationRepository _userAuthenticationRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly PushNotificationsService _pushNotificationsService;
 
-    public PollsController(PollsRepository pollsRepository, IUserAuthenticationRepository userAuthenticationRepository, IHttpContextAccessor httpContextAccessor)
+    public PollsController(PollsRepository pollsRepository,
+                           PushNotificationsService pushNotificationsService,
+                           IUserAuthenticationRepository userAuthenticationRepository,
+                           IHttpContextAccessor httpContextAccessor)
     {
         _pollsRepository = pollsRepository;
         _userAuthenticationRepository = userAuthenticationRepository;
         _httpContextAccessor = httpContextAccessor;
+        _pushNotificationsService = pushNotificationsService;
     }
 
     [HttpGet]
@@ -50,7 +56,15 @@ public class PollsController : ControllerBase
         var result = await _pollsRepository.GetPollById(id);
 
         if (result != null)
+        {
+            _pushNotificationsService.PublishMessage(new BrokerMessage()
+            {
+                Title = "Polls listed on device.",
+                Message = "Someone listed polls"
+            });
+
             return Ok(result);
+        }
 
         return NoContent();
     }

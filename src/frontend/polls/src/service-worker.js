@@ -79,8 +79,9 @@ self.addEventListener('fetch', (event) => {
 
 // Any other custom service worker logic can go here.
 
+// SUBSCRIBE TO PUSH MESSAGES EVENT
 self.addEventListener('push', event => {
-  event.waitUntil(self.registration.showNotification('Todo List', {
+  event.waitUntil(self.registration.showNotification('Polls', {
     icon: '/icon-120.png',
     body: event.data.text()
   }))

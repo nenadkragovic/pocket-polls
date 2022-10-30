@@ -12,7 +12,7 @@ COPY . .
 
 RUN npm install
 RUN node i -g serve
-RUN npm run buil
+RUN npm run build
 RUN serve -s build
 
 FROM nginx:alpine as server

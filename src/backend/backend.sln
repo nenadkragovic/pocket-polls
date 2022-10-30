@@ -7,9 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polls.Api", "Polls.Api\Poll
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polls.Api.Tests", "Polls.Api.Tests\Polls.Api.Tests.csproj", "{BB5705A0-8497-4DC8-9DEA-637A4401BE47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polls.Lib", "Polls.Lib\Polls.Lib.csproj", "{27C4DE6C-4B5D-474E-807B-89F881371135}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polls.gRPC", "Polls.gRPC\Polls.gRPC.csproj", "{B1D5ECFA-92D0-4D79-B152-D944C6BD201C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polls.Lib", "Polls.Lib\Polls.Lib.csproj", "{27C4DE6C-4B5D-474E-807B-89F881371135}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +27,6 @@ Global
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B1D5ECFA-92D0-4D79-B152-D944C6BD201C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B1D5ECFA-92D0-4D79-B152-D944C6BD201C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B1D5ECFA-92D0-4D79-B152-D944C6BD201C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B1D5ECFA-92D0-4D79-B152-D944C6BD201C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

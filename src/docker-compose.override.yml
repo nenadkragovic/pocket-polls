@@ -10,7 +10,6 @@ services:
       - ASPNETCORE_URLS=http://+:80
       - ConnectionStrings__PollsDb=Server=sql-server;Database=PollsDb;User=sa;Password=5tgbNHY^;
       - InMemoryDatabase=false
-      - StaticFilesPath=.
       - JwtConfig__Key=JwtTokenClientSettings123456
       - JwtConfig__expiresIn=99999
       - RabbitMqSettings__RabbitMqConnectionSettings__Hostname=rabbitmq

@@ -1,12 +1,14 @@
-using Microsoft.Extensions.FileProviders;
 using Microsoft.OpenApi.Models;
-using Polls.Lib.Database;
+using Polls.Api.MessageBrokers;
 using Polls.Lib.Extensions;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.ConfigurePollsServices();
+builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
+builder.Services.AddSingleton<PushNotificationsService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -87,11 +89,5 @@ app.UseAuthorization();
 
 app.MapControllers();
 app.UseCors("cors");
-
-app.UseStaticFiles(new StaticFileOptions
-{
-    FileProvider = new PhysicalFileProvider(Path.Combine(builder.Configuration["StaticFilesPath"])),
-    RequestPath = "/static"
-});
 
 app.Run();

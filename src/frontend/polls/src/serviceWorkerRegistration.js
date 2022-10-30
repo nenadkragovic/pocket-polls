@@ -65,30 +65,28 @@ export function register(config) {
       }
     });
   }
+  else{
+    console.error('Service worker not available in navigator!');
+    alert('Service worker not available in navigator!');
+  }
 }
 
 function registerValidSW(swUrl, config) {
-  console.log('uso u warn');
   navigator.serviceWorker
     .register(swUrl)
     .then((registration) => {
       console.warn('Service worker registred successfully!');
-
+      // TODO: move to config
       const key = "BDk-kDxLswQMajg9TJqpb9VFTjQeQmS0FE_rTVJ4f9G-v9GFkzcDt-vYkvz5dVkbCfrGmJeLTbvuNUKpOUojWB4";
+
       registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlB64ToUint8Array(key)
       }).then(sub => {
-        console.log("Subscribed!")
+        console.log("Push notification manager subscribed.")
       }).catch(err => {
-        console.log("Did not subscribe.")
+        console.error("Push notification manager not subscribed.")
       });
-
-      setTimeout(() => {
-        registration.showNotification('Test Message', {
-          body: 'Success!'
-        })
-      }, 4000);
 
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
@@ -124,6 +122,9 @@ function registerValidSW(swUrl, config) {
           }
         };
       };
+
+      global.registration = registration
+
     })
     .catch((error) => {
       console.error('Error during service worker registration:', error);
@@ -143,9 +144,10 @@ function checkValidServiceWorker(swUrl, config) {
         || (contentType != null && contentType.indexOf('javascript') === -1)
       ) {
         console.warn('No service worker found. Probably a different app. Reload the page.');
+        alert('No service worker found. Probably a different app. Reload the page.');
         navigator.serviceWorker.ready.then((registration) => {
           registration.unregister().then(() => {
-            window.location.reload();
+           // window.location.reload();
           });
         });
       } else {
@@ -155,6 +157,7 @@ function checkValidServiceWorker(swUrl, config) {
     })
     .catch(() => {
       console.log('No internet connection found. App is running in offline mode.');
+      alert('No internet connection found. App is running in offline mode.');
     });
 }
 

@@ -34,14 +34,6 @@ services:
     depends_on:
       - sql-server
       - rabbitmq
- polls-grpc:
-    image: polls-grpc
-    build:
-      context: backend/Polls.gRPC
-      dockerfile: Dockerfile
-    depends_on:
-      - sql-server
-      - rabbitmq
  polls-gui:
     image: polls-gui
     build:

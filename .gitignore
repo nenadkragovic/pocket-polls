@@ -116,3 +116,5 @@ dist
 bin
 obj
 /publish
+/src/data
+/src/docker-data
