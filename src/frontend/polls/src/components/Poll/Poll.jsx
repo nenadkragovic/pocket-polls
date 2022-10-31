@@ -1,5 +1,5 @@
 import { React, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 import * as style from './style/poll.scss';
 import * as http from '../../scripts/http';
 import Container from '@mui/material/Container';
@@ -18,8 +18,11 @@ import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { useNavigate } from 'react-router-dom';
 
 function Poll() {
+	const navigate = useNavigate();
+
 	const QuestionType = {
 		YesNo: 0,
 		SingleChoice: 1,
@@ -113,6 +116,10 @@ function Poll() {
 	}
 
 	const prevQuestion = () => {
+		if (questionsData.currentQuestion == 0){
+			navigate('/');
+		}
+
 		let nextQuestion = questionsData.currentQuestion > 0 ? (questionsData.currentQuestion - 1) : 0;
 		let progress = (1 + nextQuestion) / questionsData.numberOfQuestions * 100;
 		let completed = nextQuestion == (questionsData.numberOfQuestions - 1);
@@ -259,28 +266,33 @@ function Poll() {
 			{
 				questionsData.numberOfQuestions > 0 ?
 				<>
-						<div className='progress-box'>
-							<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
-							<LinearProgress className="progress" variant="determinate" value={questionsData.progress} />
-							<Typography className="questionText" textAlign="center">({questionsData.currentQuestion + 1}/{questionsData.numberOfQuestions})</Typography>
-						</div>
-						<div className="question">
-							<Typography className="questionText" textAlign="center">{questionsData.questions[questionsData.currentQuestion].questionText}</Typography>
-							<Question question={questionsData.questions[questionsData.currentQuestion]}></Question>
-						</div>
-						<div className="buttons">
-							<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
-							{
-								questionsData.completed ?
-								<Button variant="outlined" onClick={submit}>Submit</Button> :
-								<Button variant="outlined" onClick={nextQuestion}><ArrowForwardIcon></ArrowForwardIcon></Button>
-							}
-						</div>
-					</> :
-					<Box className="question">
+					<div className='progress-box'>
+						<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
+						<LinearProgress className="progress" variant="determinate" value={questionsData.progress} />
+						<Typography className="questionText" textAlign="center">({questionsData.currentQuestion + 1}/{questionsData.numberOfQuestions})</Typography>
+					</div>
+					<div className="question">
+						<Typography className="questionText" textAlign="center">{questionsData.questions[questionsData.currentQuestion].questionText}</Typography>
+						<Question question={questionsData.questions[questionsData.currentQuestion]}></Question>
+					</div>
+					<div className="buttons">
+						<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
+						{
+							questionsData.completed ?
+							<Button variant="outlined" onClick={submit}>Submit</Button> :
+							<Button variant="outlined" onClick={nextQuestion}><ArrowForwardIcon></ArrowForwardIcon></Button>
+						}
+					</div>
+				</> :
+				<>
+					<div className="question">
 						<Typography className="poll-name" textAlign="center">{poll.name}</Typography>
 						<Typography className="questionText" textAlign="center">No questions</Typography>
-					</Box>
+					</div>
+					<div className="buttons">
+						<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
+					</div>
+				</>
 			}
 		</Container>
 	);

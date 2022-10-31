@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Polls.Api.MessageBrokers;
+using Polls.Lib.MessageBrokers;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
@@ -20,10 +20,10 @@ public class PollsController : ControllerBase
     private readonly PollsRepository _pollsRepository;
     private readonly IUserAuthenticationRepository _userAuthenticationRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly PushNotificationsService _pushNotificationsService;
+    private readonly PushNotificationsBroker _pushNotificationsService;
 
     public PollsController(PollsRepository pollsRepository,
-                           PushNotificationsService pushNotificationsService,
+                           PushNotificationsBroker pushNotificationsService,
                            IUserAuthenticationRepository userAuthenticationRepository,
                            IHttpContextAccessor httpContextAccessor)
     {

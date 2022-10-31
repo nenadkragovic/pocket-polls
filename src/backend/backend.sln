@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polls.Api.Tests", "Polls.Ap
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Polls.Lib", "Polls.Lib\Polls.Lib.csproj", "{27C4DE6C-4B5D-474E-807B-89F881371135}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Polls.PushNotifications", "Polls.PushNotifications\Polls.PushNotifications.csproj", "{7EC6D5C2-8777-4BDB-8DF6-7A313A4F87D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{27C4DE6C-4B5D-474E-807B-89F881371135}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC6D5C2-8777-4BDB-8DF6-7A313A4F87D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC6D5C2-8777-4BDB-8DF6-7A313A4F87D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC6D5C2-8777-4BDB-8DF6-7A313A4F87D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC6D5C2-8777-4BDB-8DF6-7A313A4F87D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

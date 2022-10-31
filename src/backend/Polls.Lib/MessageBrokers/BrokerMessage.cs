@@ -1,4 +1,4 @@
-﻿namespace Polls.Api.MessageBrokers
+﻿namespace Polls.Lib.MessageBrokers
 {
     public class BrokerMessage
     {

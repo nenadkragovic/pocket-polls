@@ -1,6 +1,6 @@
 using Microsoft.OpenApi.Models;
-using Polls.Api.MessageBrokers;
 using Polls.Lib.Extensions;
+using Polls.Lib.MessageBrokers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.ConfigurePollsServices();
 builder.Services.Configure<RabbitMqSettings>(builder.Configuration.GetSection("RabbitMqSettings"));
-builder.Services.AddSingleton<PushNotificationsService>();
+builder.Services.AddSingleton<PushNotificationsBroker>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options =>
     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore

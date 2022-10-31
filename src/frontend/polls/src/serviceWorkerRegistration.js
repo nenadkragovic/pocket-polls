@@ -76,18 +76,6 @@ function registerValidSW(swUrl, config) {
     .register(swUrl)
     .then((registration) => {
       console.warn('Service worker registred successfully!');
-      // TODO: move to config
-      const key = "BDk-kDxLswQMajg9TJqpb9VFTjQeQmS0FE_rTVJ4f9G-v9GFkzcDt-vYkvz5dVkbCfrGmJeLTbvuNUKpOUojWB4";
-
-      registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlB64ToUint8Array(key)
-      }).then(sub => {
-        console.log("Push notification manager subscribed.")
-      }).catch(err => {
-        console.error("Push notification manager not subscribed.")
-      });
-
       registration.onupdatefound = () => {
         const installingWorker = registration.installing;
         if (installingWorker == null) {
@@ -170,5 +158,16 @@ export function unregister() {
       .catch((error) => {
         console.error(error.message);
       });
+  }
+}
+
+export const requestNotificationPermission = async () => {
+  const permission = await window.Notification.requestPermission();
+  // value of permission can be 'granted', 'default', 'denied'
+  // granted: user has accepted the request
+  // default: user has dismissed the notification permission popup by clicking on x
+  // denied: user has denied the request.
+  if(permission !== 'granted'){
+      throw new Error('Permission not granted for Notification!');
   }
 }
