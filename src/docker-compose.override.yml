@@ -15,17 +15,6 @@ services:
       - RabbitMqSettings__RabbitMqConnectionSettings__Hostname=rabbitmq
     ports:
       - "5000:80"
-  polls-grpc:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__PollsDb=Server=sql-server;Database=PollsDb;User=sa;Password=5tgbNHY^;
-      - InMemoryDatabase=false
-      - JwtConfig__Key=JwtTokenClientSettings123456
-      - JwtConfig__expiresIn=99999
-      - RabbitMqSettings__RabbitMqConnectionSettings__Hostname=rabbitmq
-    ports:
-      - "5001:80"
   sql-server:
     ports:
       - "1433:1433"

@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const webpush = require('web-push')
+const amqp = require('amqplib/callback_api');
 
 const app = express()
 
@@ -47,3 +48,28 @@ app.get('/send-notification', (req, res) => {
 })
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
+
+amqp.connect('amqp://localhost', function (error0, connection) {
+    if (error0) {
+        throw error0;
+    }
+    connection.createChannel(function (error1, channel) {
+        if (error1) {
+            throw error1;
+        }
+
+        channel.assertExchange('push-notifications-exchange', 'direct', { durable: false });
+        channel.assertQueue('push-notifications-exchange', { durable: true });
+        channel.bindQueue('push-notifications-exchange', 'push-notifications-exchange', '');
+        channel.consume('push-notifications-exchange', function (msg) {
+            if (msg.content) {
+                console.log(" [x] %s", msg.content.toString());
+                const subscription = dummyDb.subscription //get subscription from your databse here.
+                const message = msg.content.toString();
+                sendNotification(subscription, message)
+            }
+        }, {
+            noAck: true
+        });
+    });
+});
