@@ -25,12 +25,12 @@ namespace Polls.Lib.Repositories
 
             if (!string.IsNullOrEmpty(searchParam))
             {
-                query = query.Where(p => p.Name.Contains(searchParam.Trim()));
+                query = query.Where(p => p.Name!.ToLower().Contains(searchParam.Trim().ToLower()));
             }
 
             int total = await query.AsNoTracking().CountAsync();
 
-            var records = await _context.Polls
+            var records = await query
                 .Skip(offset).Take(limit)
                 .Select(p => new ListPollsDto()
                 {
