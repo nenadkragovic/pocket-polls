@@ -135,3 +135,7 @@ const showLocalNotification = (title, body, swRegistration) => {
   }
   swRegistration.showNotification(title, options)
 }
+
+setInterval(function(){
+  fetch('/ping.txt')
+}, 8000)

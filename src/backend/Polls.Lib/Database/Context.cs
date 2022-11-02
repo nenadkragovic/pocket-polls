@@ -14,8 +14,6 @@ namespace Polls.Lib.Database
         private const string ADMIN_EMAIL = "test@admin.com";
         private const string ADMIN_ID = "1efc5e3a-283b-4b05-b1ea-d2cd424c59d4";
 
-        //public virtual DbSet<IdentityUserClaim<string>> IdentityUserClaims { get; set; }
-
         public virtual DbSet<Poll> Polls { get; set; }
         public virtual DbSet<YesNoQuestion> YesNoQuestions { get; set; }
         public virtual DbSet<SingleChoiceQuestion> SingleChoiceQuestions { get; set; }
@@ -28,6 +26,7 @@ namespace Polls.Lib.Database
         public virtual DbSet<MultipleChoiceQuestionsAnswer> MultipleChoiceQuestionsAnswer { get; set; }
         public virtual DbSet<SingleChoiceOption> SingleChoiceOption { get; set; }
         public virtual DbSet<MultipleChoiceOption> MultipleChoiceOption { get; set; }
+        public virtual DbSet<PushNotificationSubscription> PushNotificationSubscriptions { get; set; }
 
         public Context(DbContextOptions<Context> options): base(options)
         {
