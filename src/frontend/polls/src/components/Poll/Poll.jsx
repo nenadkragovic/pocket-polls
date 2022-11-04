@@ -229,7 +229,7 @@ function Poll() {
 
 	const setTextAnswer = (questionId, value) => {
 		setAnswers(prevState => {
-			let objIndex = prevState.yesNoAnswers.findIndex((obj => obj.questionId === questionId));
+			let objIndex = prevState.textAnswers.findIndex((obj => obj.questionId === questionId));
 			let arr = prevState.textAnswers;
 			arr[objIndex].answer = value;
 			return {
