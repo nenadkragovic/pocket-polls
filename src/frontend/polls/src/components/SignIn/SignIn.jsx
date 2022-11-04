@@ -15,6 +15,8 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import * as http from '../../scripts/http';
 import { useNavigate } from 'react-router-dom';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 
 const SignIn = (props) => {
 	const navigate = useNavigate();
@@ -28,9 +30,21 @@ const SignIn = (props) => {
 		phoneNumber: '',
 		email: '',
 		address: ''
-	  }
+	}
+
 	const [data, setData] = useState(initData);
 
+	const [validationData, setValidationData] = useState({
+		open: false,
+		message: ''
+	});
+
+	const handleCloseValidationMessage = () => {
+		setValidationData({
+			open: false,
+			message: ''
+		})
+	}
 	const handleChange = (prop) => (event) => {
 		setData({ ...data, [prop]: event.target.value });
 	};
@@ -61,8 +75,29 @@ const SignIn = (props) => {
 					setData(initData);
 					navigate('/');
 				}
+				else if (response.response.status === 401) {
+					setValidationData({
+						open: true,
+						message: response.response.data.validationMessage
+					});
+				}
+				else setValidationData({
+					open: true,
+					message: 'Server error. :('
+				})
 			}).catch(err => {
+				if (err.response.status == 401) {
+					setValidationData({
+						open: true,
+						message: err.response.data.validationMessage
+					});
 
+					return;
+				}
+				setValidationData({
+					open: true,
+					message: 'Server error. :('
+				})
 			})
 	}
 
@@ -79,7 +114,33 @@ const SignIn = (props) => {
 				logIn();
 			}
 		}).catch(err => {
+			console.log(err)
+			if (err.response.status == 400) {
+				var message = err.message;
+				if (err.response?.data?.errors != null) {
+					if (err.response?.data?.errors.length > 0)
+						message = err.response.data.errors[0].description
+					else if (err.response?.data?.errors.Password != null)
+						message = err.response?.data?.errors.Password[0]
+					else if (err.response?.data?.errors.Email != null)
+						message = err.response?.data?.errors.Email[0]
+					else if (err.response?.data?.errors.Address != null)
+						message = err.response?.data?.errors.Address[0]
+					else if (err.response?.data?.errors.FullName != null)
+						message = err.response?.data?.errors.FullName[0]
+				}
 
+				setValidationData({
+					open: true,
+					message: message
+				});
+
+				return;
+			}
+			setValidationData({
+				open: true,
+				message: 'Server error. :('
+			})
 		})
 	}
 
@@ -194,6 +255,15 @@ const SignIn = (props) => {
 					</FormControl>
 				</Box>
 			}
+
+			<Snackbar
+				open={validationData.open}
+				autoHideDuration={6000}
+				onClose={handleCloseValidationMessage}>
+					<MuiAlert severity="error" elevation={6} variant="filled" onClose={handleCloseValidationMessage}>
+						{validationData.message}
+					</MuiAlert>
+			</Snackbar>
 		</Container>
 	);
 };

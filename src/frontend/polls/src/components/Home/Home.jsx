@@ -29,14 +29,7 @@ const Home = () => {
 
 	useEffect(() => {
 		fetchData(1);
-		// testPushMessage();
 	},[]);
-
-	// const testPushMessage = () => {
-	// 	global.registration.showNotification('Test Message', {
-	// 	  body: 'Success!'
-	// 	})
-	//   }
 
 	const fetchData = async (page, searchParam = '') => {
 		setData({

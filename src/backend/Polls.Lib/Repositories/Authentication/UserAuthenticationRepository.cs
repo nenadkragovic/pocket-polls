@@ -39,19 +39,37 @@ namespace Polls.Lib.Repositories.Authentication
             return result;
         }
 
-        public async Task<Tuple<bool, string>> ValidateUserAsync(UserLoginDto loginDto)
+        public async Task<UserValidationResult> ValidateUserAsync(UserLoginDto loginDto)
         {
             var user = await _userManager.FindByNameAsync(loginDto.UserName);
-            var result = user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password);
 
-            string token = "";
-
-            if (result)
+            if (user == null)
             {
-                token = await CreateTokenAsync(user);
+                return new UserValidationResult()
+                {
+                    Authorized = false,
+                    ValidationMessage = "User not exists."
+                };
             }
 
-            return new Tuple<bool, string>(result, token);
+            var result = user != null && await _userManager.CheckPasswordAsync(user, loginDto.Password);
+
+            if (result == false)
+            {
+                return new UserValidationResult()
+                {
+                    Authorized = false,
+                    ValidationMessage = "Password incorrect."
+                };
+            }
+
+            string token = await CreateTokenAsync(user);
+
+            return new UserValidationResult()
+            {
+                Authorized = true,
+                Token = token
+            };
         }
         public Task<User> GetUserByName(string username)
         {

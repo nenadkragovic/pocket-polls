@@ -19,6 +19,13 @@ public class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterRespondent([FromBody] CreateUserDto userRegistration)
     {
+        Console.WriteLine("USO u REQ");
+
+        if (!ModelState.IsValid)
+        {
+            BadRequest(ModelState);
+        }
+
         var userResult = await _repository.RegisterUserAsync(userRegistration, Lib.Enums.Role.User);
         return !userResult.Succeeded ? new BadRequestObjectResult(userResult) : StatusCode((int)HttpStatusCode.Created);
     }
@@ -28,8 +35,9 @@ public class UsersController : ControllerBase
     public async Task<IActionResult> Authenticate([FromBody] UserLoginDto user)
     {
         var result = await _repository.ValidateUserAsync(user);
-        if (!result.Item1)
-            return Unauthorized();
-        return Ok(new TokenDto { Token = result.Item2 });
+        if (!result.Authorized)
+            return Unauthorized(result);
+
+        return Ok(new TokenDto { Token = result.Token });
     }
 }
