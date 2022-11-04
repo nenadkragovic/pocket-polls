@@ -37,15 +37,30 @@ public class PollsController : ControllerBase
     [ProducesResponseType(typeof(ICollection<ListPollsDto>), 200)]
     [ProducesResponseType(204)]
     [AllowAnonymous]
-    public async Task<IActionResult> List([FromQuery] int offset = 0, [FromQuery] byte limit = 10, [FromQuery] string? searchParam = "")
+    public async Task<IActionResult> List(
+        [FromQuery] int offset = 0,
+        [FromQuery] byte limit = 10,
+        [FromQuery] bool getForUser = false,
+        [FromQuery] string? searchParam = "")
     {
-        var result = await _pollsRepository.ListPolls(offset, limit, searchParam ?? "");
+        Guid userId = Guid.Empty;
+        if (getForUser)
+        {
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var user = await _userAuthenticationRepository.GetUserByName(username);
+            userId = user.Id;
+        }
+
+        var result = await _pollsRepository.ListPolls(offset, limit, userId, searchParam ?? "");
 
         if (result == null || result.TotalRecords == 0)
             return NoContent();
 
         return Ok(result);
     }
+
+
 
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Poll), 200)]

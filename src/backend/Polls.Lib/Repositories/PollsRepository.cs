@@ -19,9 +19,14 @@ namespace Polls.Lib.Repositories
         }
 
         #region Public Methods
-        public async Task<ListResult<ListPollsDto>> ListPolls([FromQuery] int offset, [FromQuery] int limit, [FromQuery] string searchParam = "")
+        public async Task<ListResult<ListPollsDto>> ListPolls(int offset, int limit, Guid userId, string searchParam = "")
         {
             var query = _context.Polls.AsNoTracking(); //.Where(p => p.StartDate <= DateTime.UtcNow && p.EndDate >= DateTime.UtcNow);
+
+            if (userId != Guid.Empty)
+            {
+                query = query.Where(p => p.UserId == userId);
+            }
 
             if (!string.IsNullOrEmpty(searchParam))
             {

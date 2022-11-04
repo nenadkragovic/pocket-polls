@@ -141,6 +141,24 @@ function CreatePoll() {
 	}
 
 	const submit = async () => {
+		if (data.questions == null || data.questions < 1){
+			setValidationData({
+				open: true,
+				message: 'You must add questions.',
+				severity: 'warning'
+			})
+			return;
+		}
+
+		if (data.name === '' || data.name.length < 5){
+			setValidationData({
+				open: true,
+				message: 'Name is required.',
+				severity: 'warning'
+			})
+			return;
+		}
+
 		await http.request("polls", 'POST', data)
 				.then(result => {
 					setData(initData);
@@ -177,7 +195,6 @@ function CreatePoll() {
 		}
 
 		const removeQuestion = () => {
-			console.log('uso');
 			var questions = data.questions;
 			questions.splice(questionNumber, 1);
 			setData({
@@ -202,7 +219,7 @@ function CreatePoll() {
 						<ul>
 							{
 								data.questions[questionNumber].Choices?.map((choice) => (
-									<li>{choice.Name}</li>
+									<li key={choice.Name}>{choice.Name}</li>
 								))
 							}
 						</ul>
