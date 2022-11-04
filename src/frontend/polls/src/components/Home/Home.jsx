@@ -119,7 +119,7 @@ const Home = () => {
 				data.items.length > 0 ?
 					<Pagination
 					className='pagination'
-					count={Math.round(data.totalRecords/data.limit) + 1}
+					count={Math.ceil(data.totalRecords/data.limit)}
 					size="large"
 					onChange={handleChange}
 					/> : null

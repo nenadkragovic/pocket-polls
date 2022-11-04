@@ -14,9 +14,11 @@ import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
-import { QuestionType } from '../../scripts/enums';
+import { QuestionType, questionTypeToString } from '../../scripts/enums';
 import CloseIcon from '@mui/icons-material/Close';
 import AddIcon from '@mui/icons-material/Add';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
@@ -67,6 +69,8 @@ function CreatePoll() {
 	};
 
 	const addChoice = () => {
+		if (addQuestionData.choiceToAdd === '')
+			return;
 		if (addQuestionData.choices.includes(addQuestionData.choiceToAdd)){
 			setValidationData({
 				open: true,
@@ -156,6 +160,59 @@ function CreatePoll() {
 				});
 	}
 
+	function QuestionsPreview(props) {
+
+		const [questionNumber, setQuestionNumber] = useState(0)
+
+		const prevQuestion = () => {
+			if (questionNumber > 0) {
+				setQuestionNumber(questionNumber-1);
+			}
+		}
+
+		const nextQuestion = () => {
+			if (questionNumber < (props.questions.length -1)){
+				setQuestionNumber(questionNumber+1);
+			}
+		}
+
+		const removeQuestion = () => {
+			console.log('uso');
+			var questions = data.questions;
+			questions.splice(questionNumber, 1);
+			setData({
+				...data,
+				questions: questions,
+				numberOfQustions: questions.length
+			})
+			prevQuestion();
+		}
+
+		return (
+			<FormControl className="questions-preview">
+				<Button variant="outlined" onClick={prevQuestion}><ArrowBackIcon></ArrowBackIcon></Button>
+				{
+					data.questions[questionNumber] != null ?
+					<div style={{padding: '0.5rem'}}>
+						<h5 className='questions-name'>
+							<span>#{questionNumber + 1} ({questionTypeToString(data.questions[questionNumber].QuestionType)}):</span>
+							<span className='remove-question'><IconButton onClick={() => removeQuestion()} edge="end" aria-label="delete"><CloseIcon /></IconButton></span>
+						</h5>
+						<p>{data.questions[questionNumber].Text}</p>
+						<ul>
+							{
+								data.questions[questionNumber].Choices?.map((choice) => (
+									<li>{choice.Name}</li>
+								))
+							}
+						</ul>
+					</div> : null
+				}
+				<Button variant="outlined" onClick={nextQuestion}><ArrowForwardIcon></ArrowForwardIcon></Button>
+			</FormControl>
+		);
+	}
+
 	return (
 		<Container style={style} className="create-poll-container">
 			<FormControl className="form-control">
@@ -179,6 +236,10 @@ function CreatePoll() {
 				/>
 			</FormControl>
 			<Typography variant="h5" component="div" style={{ marginBottom: '1rem'}}>Questions ({data.numberOfQustions}):</Typography>
+			{
+				data.questions != null && data.questions.length > 0 ?
+					<QuestionsPreview questions={data.questions}></QuestionsPreview> : null
+			}
 			<Button variant="outlined" onClick={() => openAddQuestionDialog(true)}>Add new question</Button>
 
 			{

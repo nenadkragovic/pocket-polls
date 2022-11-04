@@ -4,3 +4,10 @@ export const QuestionType = {
     MultipleChoice: 2,
     Text: 3
 }
+
+export const questionTypeToString = (type) => {
+    for (const [key, value] of Object.entries(QuestionType)) {
+        if (value == type)
+        return key.split(/(?=[A-Z])/).join(" ");
+    }
+}
