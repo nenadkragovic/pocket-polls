@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState }from 'react';
+import { useState } from 'react';
 import './style/signIn.scss';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
@@ -152,8 +152,9 @@ const SignIn = (props) => {
 				<Box className="form-box">
 					<Typography variant="h5" component="div" style={{ marginBottom: '2rem'}}>Log in</Typography>
 					<FormControl className="form-control">
-						<InputLabel htmlFor="outlined-adornment-password">Username</InputLabel>
+						<InputLabel htmlFor="outlined-adornment-username">Username</InputLabel>
 						<OutlinedInput
+							id="outlined-adornment-username"
 							value={data.username}
 							onChange={handleChange('username')}
 							aria-describedby="outlined-weight-helper-text"

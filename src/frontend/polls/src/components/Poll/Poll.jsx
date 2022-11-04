@@ -22,16 +22,11 @@ import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import * as validation from '../../scripts/validationHelper';
+import { QuestionType } from '../../scripts/enums';
 
 function Poll() {
 	const navigate = useNavigate();
 
-	const QuestionType = {
-		YesNo: 0,
-		SingleChoice: 1,
-		MultipleChoice: 2,
-		Text: 3
-	}
 	const { id } = useParams();
 	const [poll, setPoll] = useState({});
 	const [questionsData, setQuestionsData] = useState({
@@ -51,7 +46,8 @@ function Poll() {
 
 	const [validationData, setValidationData] = useState({
 		open: false,
-		message: ''
+		message: '',
+		severity: 'success'
 	});
 
 	const handleCloseValidationMessage = () => {

@@ -32,6 +32,6 @@ namespace Polls.Lib.DTO
     public class CreateChoiceDto
     {
         public string Name { get; set; }
-        public string Description { get; set; }
+        public string Description { get; set; } = String.Empty;
     }
 }
