@@ -19,6 +19,9 @@ import Checkbox from '@mui/material/Checkbox';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
+import * as validation from '../../scripts/validationHelper';
 
 function Poll() {
 	const navigate = useNavigate();
@@ -33,17 +36,34 @@ function Poll() {
 	const [poll, setPoll] = useState({});
 	const [questionsData, setQuestionsData] = useState({
 		questions: [],
-		progress: 50,
+		progress: 0,
 		currentQuestion: 0,
 		numberOfQuestions: 0,
 		completed: false
 	});
+
 	const [answers, setAnswers] = useState({
 		yesNoAnswers: [],
 		singleChoiceAnswers: [],
 		multipleChoiceAnswers: [],
 		textAnswers: [],
 	});
+
+	const [validationData, setValidationData] = useState({
+		open: false,
+		message: ''
+	});
+
+	const handleCloseValidationMessage = () => {
+		setValidationData({
+			...validationData,
+			open: false,
+			message: '',
+		})
+
+		if (validationData.severity === 'success')
+			navigate('/');
+	}
 
 	useEffect(() => {
 		http.request('polls/' + id, 'GET', null)
@@ -132,14 +152,22 @@ function Poll() {
 	}
 
 	const submit = () => {
-		console.log(answers);
-
 		http.request('answers/' + poll.id, 'POST', answers)
 			.then(result => {
-				console.log(result);
+				setValidationData({
+					open: true,
+					message: 'Answers submitted successfully!',
+					severity: 'success'
+				})
 			})
 			.catch(err => {
-				console.log(err);
+				var message = validation.getValidationMessage(err.response.data);
+
+				setValidationData({
+					open: true,
+					message: message,
+					severity: 'error'
+				})
 			});
 	}
 
@@ -263,6 +291,15 @@ function Poll() {
 	}
 	return (
 		<Container style={style} className="container">
+			<Snackbar
+				className='validation'
+				open={validationData.open}
+				autoHideDuration={6000}
+				onClose={handleCloseValidationMessage}>
+					<MuiAlert severity={validationData.severity} elevation={6} variant="filled" onClose={handleCloseValidationMessage}>
+						{validationData.message}
+					</MuiAlert>
+			</Snackbar>
 			{
 				questionsData.numberOfQuestions > 0 ?
 				<>

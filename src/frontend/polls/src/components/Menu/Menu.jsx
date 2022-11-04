@@ -10,7 +10,6 @@ import Container from '@mui/material/Container';
 import Avatar from '@mui/material/Avatar';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import PollIcon from '@mui/icons-material/Poll';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 
@@ -47,7 +46,6 @@ const ResponsiveAppBar = (props) => {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <PollIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -87,7 +85,6 @@ const ResponsiveAppBar = (props) => {
               ))}
             </Menu>
           </Box>
-          <PollIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
               <NavLink key={page.name} to={page.url} className="navigationLinksItem"  style={{ textDecoration: 'none', marginRight: '1rem' }}>
