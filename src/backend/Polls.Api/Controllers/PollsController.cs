@@ -144,13 +144,21 @@ public class PollsController : ControllerBase
     {
         try
         {
-            await _pollsRepository.DeletePoll(pollId);
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var user = await _userAuthenticationRepository.GetUserByName(username);
+
+            await _pollsRepository.DeletePoll(pollId, user.Id);
 
             return Ok();
         }
         catch (RecordNotFoundException e)
         {
             return NotFound(e.Message);
+        }
+        catch (ForbiddenException)
+        {
+            return Forbid();
         }
     }
 }

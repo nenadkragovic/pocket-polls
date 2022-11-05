@@ -183,12 +183,15 @@ namespace Polls.Lib.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeletePoll(long pollId)
+        public async Task DeletePoll(long pollId, Guid userId)
         {
             var poll = await _context.Polls.FindAsync(pollId);
 
             if (poll == null)
                 throw new RecordNotFoundException($"Poll with id: {pollId} is not found.");
+
+            if (poll.UserId != userId)
+                throw new ForbiddenException();
 
             _context.YesNoAnswers.RemoveRange(await _context.YesNoAnswers.Where(a => a.Question.PollId == pollId).ToListAsync());
             _context.YesNoQuestions.RemoveRange(await _context.YesNoQuestions.Where(q => q.PollId == pollId).ToListAsync());

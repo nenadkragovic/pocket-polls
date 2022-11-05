@@ -21,7 +21,6 @@ const Home = () => {
 
 	const [data, setData] = useState({
 		items: [],
-		offset: 0,
 		limit: 5,
 		totalRecords: 0,
 		requestInProgress: false
@@ -39,13 +38,21 @@ const Home = () => {
 		let offset = data.limit * (page-1);
 			await http.request("polls?offset=" + offset + "&limit=" + data.limit + "&searchParam=" + searchParam, 'GET', null)
 				.then(result => {
-					setData({
-						...data,
-						items: result.data.records,
-						offset: offset,
-						totalRecords: result.data.totalRecords,
-						requestInProgress: false
-					});
+					if (result.status === 200)
+						setData({
+							...data,
+							items: result.data.records,
+							totalRecords: result.data.totalRecords,
+							requestInProgress: false
+						});
+					else {
+						setData({
+							...data,
+							items: [],
+							totalRecords: 0,
+							requestInProgress: false
+						});
+					}
 				}).catch(err => {
 					setData({
 						...data,
@@ -59,8 +66,7 @@ const Home = () => {
 		setData({
 			...data,
 			items: [],
-			totalRecords: 0,
-			offset: 0
+			totalRecords: 0
 		});
 		await fetchData(1, event.target.value);
 	}
@@ -93,8 +99,8 @@ const Home = () => {
 							</div>
 						)}
 					</div> :
-					data.items.length > 0 ?
-					data.items.map((item) => (
+					data !== undefined && data.totalRecords > 0 ?
+					data.items?.map((item) => (
 					<Card className="poll-thumb" key={item.id}>
 						<CardContent>
 							<Typography variant="h5" component="div">
