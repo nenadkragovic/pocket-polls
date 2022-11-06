@@ -185,7 +185,7 @@ function Answers() {
                     onPageChange={handleChange}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            <PollAnswers poll={selectedPoll} answers={selectedPollAnswers}></PollAnswers>
+            <PollAnswers poll={selectedPoll} answers={selectedPollAnswers} style={style}></PollAnswers>
             </Container>
             <Snackbar
                 className='validation'
