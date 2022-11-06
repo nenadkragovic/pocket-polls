@@ -58,55 +58,63 @@ namespace Polls.Lib.Repositories
         {
             var result = new GetAnswersDto();
 
-            result.YesNoAnswers = await _context.YesNoAnswers
-                .Where(a => a.Question.PollId == pollId).ToListAsync();
-            result.SingleChoiceAnswers = await _context.SingleChoiceAnswers
-                .Include(c => c.SingleChoice)
-                .Where(a => a.Question.PollId == pollId).ToListAsync();
-            result.MultipleChoiceAnswers = await _context.MultipleChoiceAnswers
-                .Include(c => c.MultipleChoiceQuestionsAnswers)
-                    .ThenInclude(c => c.MultipleChoiceOption)
-                .Where(a => a.Question.PollId == pollId).ToListAsync();
-            result.TextAnswers = await _context.TextAnswers
-                .Where(a => a.Question.PollId == pollId).ToListAsync();
+            result.YesNoAnswers = await _context.YesNoQuestions
+                .AsNoTracking()
+                .Where(q => q.PollId == pollId)
+                .Select(q => new YesNoAnswerDto()
+                {
+                    QuestionId = q.Id,
+                    QuestionText = q.QuestionText,
+                    YesCount = q.YesNoAnswers.Where(a => a.Answer).Count(),
+                    Total = q.YesNoAnswers.Count()
+                })
+                .ToListAsync();
 
-            return result;
-        }
+            result.SingleChoiceAnswers = await _context.SingleChoiceQuestions
+                .AsNoTracking()
+                .Where(q => q.PollId == pollId)
+                .Select(q => new SingleMultiAnswersDto()
+                {
+                    QuestionId = q.Id,
+                    QuestionText = q.QuestionText,
+                    Total = q.SingleChoiceAnswers.Count(),
+                    Choices = q.Choices.Select(c => new ChoiceAnswersDto()
+                    {
+                        ChoiceId = c.Id,
+                        ChoiceName = c.Name,
+                        Total = c.SingleChoiceAnswers.Count()
+                    }).ToList()
+                })
+                .ToListAsync();
 
-        public async Task<GetAnswersDto> GetAnswersByPollIdForUser(long pollId, Guid userId)
-        {
-            var result = new GetAnswersDto();
+            result.MultipleChoiceAnswers = await _context.MultipleChoiceQuestions
+                .AsNoTracking()
+                .Where(q => q.PollId == pollId)
+                .Select(q => new SingleMultiAnswersDto()
+                {
+                    QuestionId = q.Id,
+                    QuestionText = q.QuestionText,
+                    Total = q.MultipleChoiceAnswer.Count(),
+                    Choices = q.Choices.Select(c => new ChoiceAnswersDto()
+                    {
+                        ChoiceId = c.Id,
+                        ChoiceName = c.Name,
+                        Total = c.MultipleChoiceQuestionsAnswers.Count()
+                    }).ToList()
+                })
+                .ToListAsync();
 
-            result.YesNoAnswers = await _context.YesNoAnswers
-                .Where(a => a.Question.PollId == pollId && a.UserId == userId).ToListAsync();
-            result.SingleChoiceAnswers = await _context.SingleChoiceAnswers
-                .Include(c => c.SingleChoice)
-                .Where(a => a.Question.PollId == pollId && a.UserId == userId).ToListAsync();
-            result.MultipleChoiceAnswers = await _context.MultipleChoiceAnswers
-                .Include(c => c.MultipleChoiceQuestionsAnswers)
-                    .ThenInclude(c => c.MultipleChoiceOption)
-                .Where(a => a.Question.PollId == pollId && a.UserId == userId).ToListAsync();
-            result.TextAnswers = await _context.TextAnswers
-                .Where(a => a.Question.PollId == pollId && a.UserId == userId).ToListAsync();
-
-            return result;
-        }
-
-        public async Task<GetAnswersDto> GetAnswersByPollIdForUsers(long pollId, ICollection<Guid> userIds)
-        {
-            var result = new GetAnswersDto();
-
-            result.YesNoAnswers = await _context.YesNoAnswers
-                .Where(a => a.Question.PollId == pollId && userIds.Contains(a.UserId)).ToListAsync();
-            result.SingleChoiceAnswers = await _context.SingleChoiceAnswers
-                .Include(c => c.SingleChoice)
-                .Where(a => a.Question.PollId == pollId && userIds.Contains(a.UserId)).ToListAsync();
-            result.MultipleChoiceAnswers = await _context.MultipleChoiceAnswers
-                .Include(c => c.MultipleChoiceQuestionsAnswers)
-                    .ThenInclude(c => c.MultipleChoiceOption)
-                .Where(a => a.Question.PollId == pollId && userIds.Contains(a.UserId)).ToListAsync();
-            result.TextAnswers = await _context.TextAnswers
-                .Where(a => a.Question.PollId == pollId && userIds.Contains(a.UserId)).ToListAsync();
+            result.TextAnswers = await _context.TextQuestions
+                .AsNoTracking()
+                .Where(q => q.PollId == pollId)
+                .Select(q => new TextAnswersDto()
+                {
+                    QuestionId = q.Id,
+                    QuestionText = q.QuestionText,
+                    Total = q.TextAnswers.Count(),
+                    Answers = q.TextAnswers.Select(a => a.Answer).ToList()
+                })
+                .ToListAsync();
 
             return result;
         }

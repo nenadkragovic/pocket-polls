@@ -1,5 +1,5 @@
 import { React, useEffect } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import * as style from './style/poll.scss';
 import * as http from '../../scripts/http';
 import Container from '@mui/material/Container';

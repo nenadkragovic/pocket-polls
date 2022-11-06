@@ -356,10 +356,10 @@ namespace Polls.Api.Tests
 
             var model = new AddAnswersDto()
             {
-                YesNoAnswers = pollObject.YesNoQuestions.Select(q => new YesNoAnswerDto() { QuestionId = q.Id, Answer = true }).ToList(),
-                TextAnswers = pollObject.TextQuestions.Select(q => new TextAnswerDto() { QuestionId = q.Id, Answer = "Answer to text question" }).ToList(),
-                SingleChoiceAnswers = pollObject.SingleChoiceQuestions.Select(q => new SingleChoiceAnswerDto() { QuestionId = q.Id, ChoiceId = q.Choices.FirstOrDefault().Id }).ToList(),
-                MultipleChoiceAnswers = pollObject.MultipleChoiceQuestions.Select(q => new MultipleChoiceAnswerDto() { QuestionId = q.Id, ChoiceIds = q.Choices.Select(c => c.Id).ToList()}).ToList()
+                YesNoAnswers = pollObject.YesNoQuestions.Select(q => new AddYesNoAnswerDto() { QuestionId = q.Id, Answer = true }).ToList(),
+                TextAnswers = pollObject.TextQuestions.Select(q => new AddTextAnswerDto() { QuestionId = q.Id, Answer = "Answer to text question" }).ToList(),
+                SingleChoiceAnswers = pollObject.SingleChoiceQuestions.Select(q => new AddSingleChoiceAnswerDto() { QuestionId = q.Id, ChoiceId = q.Choices.FirstOrDefault().Id }).ToList(),
+                MultipleChoiceAnswers = pollObject.MultipleChoiceQuestions.Select(q => new AddMultipleChoiceAnswerDto() { QuestionId = q.Id, ChoiceIds = q.Choices.Select(c => c.Id).ToList()}).ToList()
             };
 
             response = await _server.CreateRequest($"/api/answers/{pollObject.Id}")

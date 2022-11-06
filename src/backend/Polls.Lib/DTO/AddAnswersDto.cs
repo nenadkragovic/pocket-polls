@@ -4,13 +4,13 @@ namespace Polls.Lib.DTO
 {
     public class AddAnswersDto
     {
-        public ICollection<YesNoAnswerDto> YesNoAnswers { get; set; }
-        public ICollection<TextAnswerDto> TextAnswers { get; set; }
-        public ICollection<SingleChoiceAnswerDto> SingleChoiceAnswers { get; set; }
-        public ICollection<MultipleChoiceAnswerDto> MultipleChoiceAnswers { get; set; }
+        public ICollection<AddYesNoAnswerDto> YesNoAnswers { get; set; }
+        public ICollection<AddTextAnswerDto> TextAnswers { get; set; }
+        public ICollection<AddSingleChoiceAnswerDto> SingleChoiceAnswers { get; set; }
+        public ICollection<AddMultipleChoiceAnswerDto> MultipleChoiceAnswers { get; set; }
     }
 
-    public class YesNoAnswerDto
+    public class AddYesNoAnswerDto
     {
         [Required]
         public long QuestionId { get; set; }
@@ -18,7 +18,7 @@ namespace Polls.Lib.DTO
         public bool Answer { get; set; }
     }
 
-    public class TextAnswerDto
+    public class AddTextAnswerDto
     {
         [Required]
         public long QuestionId { get; set; }
@@ -26,7 +26,7 @@ namespace Polls.Lib.DTO
         public string Answer { get; set; }
     }
 
-    public class SingleChoiceAnswerDto
+    public class AddSingleChoiceAnswerDto
     {
         [Required]
         public long QuestionId { get; set; }
@@ -34,7 +34,7 @@ namespace Polls.Lib.DTO
         public long ChoiceId { get; set; }
     }
 
-    public class MultipleChoiceAnswerDto
+    public class AddMultipleChoiceAnswerDto
     {
         [Required]
         public long QuestionId { get; set; }

@@ -231,6 +231,15 @@ function CreatePoll() {
 
     return (
         <>
+        <Snackbar
+            className='validation'
+            open={validationData.open}
+            autoHideDuration={6000}
+            onClose={handleCloseValidationMessage}>
+                <MuiAlert severity={validationData.severity} elevation={6} variant="filled" onClose={handleCloseValidationMessage}>
+                    {validationData.message}
+                </MuiAlert>
+        </Snackbar>
         <Container style={style} className="create-poll-container">
             <FormControl className="form-control">
                 <InputLabel htmlFor="outlined-adornment-name">Poll Name</InputLabel>
@@ -332,15 +341,6 @@ function CreatePoll() {
                 <Button variant="contained" onClick={submit}>Submit Poll</Button>
             </FormControl>
         </Container>
-        <Snackbar
-            className='validation'
-            open={validationData.open}
-            autoHideDuration={6000}
-            onClose={handleCloseValidationMessage}>
-                <MuiAlert severity={validationData.severity} elevation={6} variant="filled" onClose={handleCloseValidationMessage}>
-                    {validationData.message}
-                </MuiAlert>
-        </Snackbar>
         </>
     );
 };

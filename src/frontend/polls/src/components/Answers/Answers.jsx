@@ -22,14 +22,14 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { PollAnswers } from './PollAnswers';
 
 function Answers() {
-
-    const [data, setData] = useState({
+    const initData = {
         items: [],
-        page: 0,
-        limit: 2,
-        totalRecords: 0,
-        requestInProgress: false,
-      });
+        totalRecords: 0
+    }
+
+    const [polls, setPolls] = useState(initData);
+    const [rowsPerPage, setRowsPerPage] = useState(5);
+    const [page, setPage] = useState(0);
 
     const [validationData, setValidationData] = useState({
         open: false,
@@ -39,12 +39,11 @@ function Answers() {
     const [open, setOpen] = React.useState(false);
     const [pollToDelete, setPollToDelete] = React.useState(null);
     const [selectedPoll, setSelectedPoll] = React.useState(null);
+    const [selectedPollAnswers, setSelectedPollAnswers] = React.useState(null);
 
     useEffect(() => {
         fetchData();
     },[]);
-
-
 
     const handleCloseValidationMessage = () => {
         setValidationData({
@@ -64,56 +63,39 @@ function Answers() {
     };
 
     const fetchData = async (searchParam = '') => {
-        setData({
-            ...data,
-            requestInProgress: true
-        });
-        let offset = data.limit * data.page;
-            await http.request("polls?getForUser=true&offset=" + offset + "&limit=" + data.limit + "&searchParam=" + searchParam, 'GET', null)
+        let offset = rowsPerPage * page;
+            await http.request("polls?getForUser=true&offset=" + offset + "&limit=" + rowsPerPage + "&searchParam=" + searchParam, 'GET', null)
                 .then(result => {
-                    setData({
-                        ...data,
+                    setPolls({
                         items: result.data.records,
-                        totalRecords: result.data.totalRecords,
-                        requestInProgress: false
+                        totalRecords: result.data.totalRecords
                     });
                 }).catch(err => {
-                    setData({
-                        ...data,
-                        requestInProgress: false
-                    });
+                    console.log(err);
                 });
 
     };
 
     const searchPolls = async (event) => {
-        setData({
-            ...data,
-            items: [],
-            totalRecords: 0,
-            page: 0
-        });
+        setPage(0);
         await fetchData(event.target.value);
     }
 
     const handleChange = async (e, p) => {
-        console.log(p);
-        setData({
-            ...data,
-            page: p
-        })
-        console.log(data.page);
+        setPage(p);
+        setPolls({
+            items: [],
+            totalRecords: 0
+        });
         await fetchData();
     }
 
     const handleChangeRowsPerPage = async (event) => {
-        console.log(event.target.value);
-        setData({
-            ...data,
-            limit: event.target.value,
-            page: 0
+        setRowsPerPage(event.target.value);
+        setPolls({
+            items: [],
+            totalRecords: 0
         });
-
         await fetchData();
     }
 
@@ -126,12 +108,13 @@ function Answers() {
                     message: 'Poll deleted successfully!',
                     severity: 'success'
                 })
-                var items = data.items.filter(function(value, index, arr){
+                var items = polls.items.filter(function(value, index, arr){
                     return value.id !== pollToDelete;
                 });
-                setData({
-                    ...data,
-                    items: items
+                setPolls({
+                    ...polls,
+                    items: items,
+                    totalRecords: polls.totalRecords - 1
                 });
             }).catch(err => {
                 var message = validation.getValidationMessage(err.response.data);
@@ -143,6 +126,21 @@ function Answers() {
                 })
             });
     }
+
+    useEffect(() => {
+        if (selectedPoll != null)
+            http.request(`answers/${selectedPoll.id}`)
+                .then(result => {
+                    setSelectedPollAnswers(result.data);
+                }).catch(err => {
+                    console.log(err);
+                    setValidationData({
+                        open: true,
+                        message: 'Failed to fetch polls fata.',
+                        severity: 'error'
+                    })
+                });
+    },[selectedPoll]);
 
     return (
         <>
@@ -158,7 +156,7 @@ function Answers() {
                     </TableRow>
                     </TableHead>
                     <TableBody>
-                    {data.items.map((row) => (
+                    {polls.items.map((row) => (
                         <TableRow
                         key={row.id}
                         sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
@@ -168,7 +166,7 @@ function Answers() {
                         </TableCell>
                         <TableCell>{row.name}</TableCell>
                         <TableCell align="right">
-                            <Button variant="outlined" onClick={()=> setSelectedPoll(row.id)}>show</Button>
+                            <Button variant="outlined" onClick={()=> setSelectedPoll(row)}>show</Button>
                         </TableCell>
                         <TableCell align="right">
                             <Button variant="outlined" onClick={()=> handleOpenDeleteDialog(row.id)}><DeleteForeverIcon></DeleteForeverIcon></Button>
@@ -181,13 +179,13 @@ function Answers() {
                 <TablePagination
                     rowsPerPageOptions={[2, 5, 10, 25]}
                     component="div"
-                    count={Math.ceil(data.totalRecords/data.limit)}
-                    rowsPerPage={data.limit}
-                    page={data.page}
+                    count={Math.ceil(polls.totalRecords/rowsPerPage)}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
                     onPageChange={handleChange}
                     onRowsPerPageChange={handleChangeRowsPerPage}
                 />
-            <PollAnswers pollId={selectedPoll}></PollAnswers>
+            <PollAnswers poll={selectedPoll} answers={selectedPollAnswers}></PollAnswers>
             </Container>
             <Snackbar
                 className='validation'
