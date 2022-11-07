@@ -21,7 +21,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import * as validation from '../../scripts/validationHelper';
+import * as validation from '../../scripts/helper';
 import { QuestionType } from '../../scripts/enums';
 
 function Poll() {

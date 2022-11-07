@@ -13,7 +13,7 @@ import Paper from '@mui/material/Paper';
 import { Container } from '@mui/material';
 import Button from '@mui/material/Button';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
-import * as validation from '../../scripts/validationHelper';
+import * as validation from '../../scripts/helper';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
 import Dialog from '@mui/material/Dialog';
@@ -27,11 +27,11 @@ function Answers() {
         totalRecords: 0
     }
 
-    const [polls, setPolls] = useState(initData);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [page, setPage] = useState(0);
+    const [polls, setPolls] = React.useState(initData);
+    const [rowsPerPage, setRowsPerPage] = React.useState(5);
+    const [page, setPage] = React.useState(0);
 
-    const [validationData, setValidationData] = useState({
+    const [validationData, setValidationData] = React.useState({
         open: false,
         message: '',
     });
@@ -83,19 +83,12 @@ function Answers() {
 
     const handleChange = async (e, p) => {
         setPage(p);
-        setPolls({
-            items: [],
-            totalRecords: 0
-        });
         await fetchData();
     }
 
     const handleChangeRowsPerPage = async (event) => {
-        setRowsPerPage(event.target.value);
-        setPolls({
-            items: [],
-            totalRecords: 0
-        });
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
         await fetchData();
     }
 
@@ -116,6 +109,7 @@ function Answers() {
                     items: items,
                     totalRecords: polls.totalRecords - 1
                 });
+                fetchData()
             }).catch(err => {
                 var message = validation.getValidationMessage(err.response.data);
 
@@ -144,7 +138,7 @@ function Answers() {
 
     return (
         <>
-            <Container style={style}>
+            <Container style={style} className="cont">
                 <TableContainer component={Paper} style={{marginTop: '1rem'}}>
                 <Table sx={{ minWidth: '100%' }} aria-label="simple table">
                     <TableHead>
@@ -179,7 +173,7 @@ function Answers() {
                 <TablePagination
                     rowsPerPageOptions={[2, 5, 10, 25]}
                     component="div"
-                    count={Math.ceil(polls.totalRecords/rowsPerPage)}
+                    count={polls.totalRecords}
                     rowsPerPage={rowsPerPage}
                     page={page}
                     onPageChange={handleChange}

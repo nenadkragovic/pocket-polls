@@ -101,10 +101,11 @@ const Home = () => {
 					</div> :
 					data !== undefined && data.totalRecords > 0 ?
 					data.items?.map((item) => (
-					<Card className="poll-thumb" key={item.id}>
+					<Card sx={{ boxShadow: 3 }} className="poll-thumb" key={item.id}>
 						<CardContent>
 							<Typography variant="h5" component="div">
-								{item.name} (#{item.id})
+								{item.name}
+								{/* (#{item.id}) */}
 							</Typography>
 							<Typography variant="body2">
 								{item.description}

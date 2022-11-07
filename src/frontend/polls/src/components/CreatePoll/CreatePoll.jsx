@@ -22,7 +22,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemText from '@mui/material/ListItemText';
-import * as validation from '../../scripts/validationHelper';
+import * as validation from '../../scripts/helper';
 
 function CreatePoll() {
     const navigate = useNavigate();

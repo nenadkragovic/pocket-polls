@@ -13,16 +13,13 @@
 	.poll-thumbs-list {
 		height: 70vh;
 		overflow: scroll;
-		overflow-x: hidden; 
+		overflow-x: hidden;
 	}
 	.poll-thumb {
 		min-width: 60vw;
 		padding:1rem;
 		margin:1rem;
-		border: 0px;
 		box-sizing: border-box;
-		border-radius: 1rem;
-		border: 1px solid black;
 		.card-actions {
 			display: flex;
 			align-items: center;
