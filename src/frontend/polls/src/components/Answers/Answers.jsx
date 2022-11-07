@@ -42,7 +42,7 @@ function Answers() {
     const [selectedPollAnswers, setSelectedPollAnswers] = React.useState(null);
 
     useEffect(() => {
-        fetchData();
+        fetchData(0, rowsPerPage);
     },[]);
 
     const handleCloseValidationMessage = () => {
@@ -62,9 +62,8 @@ function Answers() {
         setPollToDelete(null);
     };
 
-    const fetchData = async (searchParam = '') => {
-        let offset = rowsPerPage * page;
-            await http.request("polls?getForUser=true&offset=" + offset + "&limit=" + rowsPerPage + "&searchParam=" + searchParam, 'GET', null)
+    const fetchData = async (offset, limit) => {
+            await http.request("polls?getForUser=true&offset=" + offset + "&limit=" + limit, 'GET', null)
                 .then(result => {
                     setPolls({
                         items: result.data.records,
@@ -76,20 +75,16 @@ function Answers() {
 
     };
 
-    const searchPolls = async (event) => {
-        setPage(0);
-        await fetchData(event.target.value);
-    }
-
     const handleChange = async (e, p) => {
+        console.log(p);
         setPage(p);
-        await fetchData();
+        await fetchData(rowsPerPage*p, rowsPerPage);
     }
 
     const handleChangeRowsPerPage = async (event) => {
-        setRowsPerPage(parseInt(event.target.value, 10));
+        setRowsPerPage(+event.target.value);
         setPage(0);
-        await fetchData();
+        await fetchData(0, event.target.value);
     }
 
     const deletePoll = async () => {
