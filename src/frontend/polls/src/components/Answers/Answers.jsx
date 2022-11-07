@@ -65,6 +65,13 @@ function Answers() {
     const fetchData = async (offset, limit) => {
             await http.request("polls?getForUser=true&offset=" + offset + "&limit=" + limit, 'GET', null)
                 .then(result => {
+                    if (result.status === 204) {
+                        setPolls({
+                            items: [],
+                            totalRecords: 0
+                        });
+                        return;
+                    }
                     setPolls({
                         items: result.data.records,
                         totalRecords: result.data.totalRecords
@@ -134,47 +141,53 @@ function Answers() {
     return (
         <>
             <Container style={style} className="cont">
-                <TableContainer component={Paper} style={{marginTop: '1rem'}}>
-                <Table sx={{ minWidth: '100%' }} aria-label="simple table">
-                    <TableHead>
-                    <TableRow>
-                        <TableCell align="left">Id</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell align="right"></TableCell>
-                        <TableCell align="right"></TableCell>
-                    </TableRow>
-                    </TableHead>
-                    <TableBody>
-                    {polls.items.map((row) => (
-                        <TableRow
-                        key={row.id}
-                        sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                        >
-                        <TableCell component="th" align="left" scope="row">
-                            {row.id}
-                        </TableCell>
-                        <TableCell>{row.name}</TableCell>
-                        <TableCell align="right">
-                            <Button variant="outlined" onClick={()=> setSelectedPoll(row)}>show</Button>
-                        </TableCell>
-                        <TableCell align="right">
-                            <Button variant="outlined" onClick={()=> handleOpenDeleteDialog(row.id)}><DeleteForeverIcon></DeleteForeverIcon></Button>
-                        </TableCell>
-                        </TableRow>
-                    ))}
-                    </TableBody>
-                </Table>
-                </TableContainer>
-                <TablePagination
-                    rowsPerPageOptions={[2, 5, 10, 25]}
-                    component="div"
-                    count={polls.totalRecords}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onPageChange={handleChange}
-                    onRowsPerPageChange={handleChangeRowsPerPage}
-                />
-            <PollAnswers poll={selectedPoll} answers={selectedPollAnswers} style={style}></PollAnswers>
+                {
+                    polls.totalRecords > 0 ?
+                    <>
+                        <TableContainer component={Paper} style={{marginTop: '1rem'}}>
+                            <Table sx={{ minWidth: '100%' }} aria-label="simple table">
+                                <TableHead>
+                                <TableRow>
+                                    <TableCell align="left">Id</TableCell>
+                                    <TableCell>Name</TableCell>
+                                    <TableCell align="right"></TableCell>
+                                    <TableCell align="right"></TableCell>
+                                </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                {polls.items.map((row) => (
+                                    <TableRow
+                                    key={row.id}
+                                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                                    >
+                                    <TableCell component="th" align="left" scope="row">
+                                        {row.id}
+                                    </TableCell>
+                                    <TableCell>{row.name}</TableCell>
+                                    <TableCell align="right">
+                                        <Button variant="outlined" onClick={()=> setSelectedPoll(row)}>show</Button>
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Button variant="outlined" onClick={()=> handleOpenDeleteDialog(row.id)}><DeleteForeverIcon></DeleteForeverIcon></Button>
+                                    </TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <TablePagination
+                            rowsPerPageOptions={[2, 5, 10, 25]}
+                            component="div"
+                            count={polls.totalRecords}
+                            rowsPerPage={rowsPerPage}
+                            page={page}
+                            onPageChange={handleChange}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                        />
+                        <PollAnswers poll={selectedPoll} answers={selectedPollAnswers} style={style}></PollAnswers>
+                        </>
+                        : <h4>You have no polls</h4>
+                    }
             </Container>
             <Snackbar
                 className='validation'
