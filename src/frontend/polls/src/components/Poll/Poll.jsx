@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import * as style from './style/poll.scss';
 import * as http from '../../scripts/http';
 import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
 import { useState } from 'react';
 import Typography from '@mui/material/Typography';
 import LinearProgress from '@mui/material/LinearProgress';
@@ -77,6 +76,7 @@ function Poll() {
 						questionId: item.id,
 						answer: false
 					});
+					return null;
 				});
 				result.data.singleChoiceQuestions.map((item) => {
 					questions.push(item);
@@ -84,6 +84,7 @@ function Poll() {
 						questionId: item.id,
 						choiceId: item.choices[0].id
 					});
+					return null;
 				});
 				result.data.multipleChoiceQuestions.map((item) => {
 					questions.push(item);
@@ -91,6 +92,7 @@ function Poll() {
 						questionId: item.id,
 						choiceIds: []
 					});
+					return null;
 				});
 				result.data.textQuestions.map((item) => {
 					questions.push(item);
@@ -98,6 +100,7 @@ function Poll() {
 						questionId: item.id,
 						answer: ''
 					});
+					return null;
 				});
 
 				setQuestionsData({
@@ -116,12 +119,12 @@ function Poll() {
 			})
 			.catch(err => {
 			});
-	}, []);
+	}, [id]);
 
 	const nextQuestion = () => {
 		let nextQuestion = questionsData.currentQuestion < (questionsData.numberOfQuestions - 1) ?
 			(1 + questionsData.currentQuestion) : questionsData.currentQuestion;
-		let completed = nextQuestion == (questionsData.numberOfQuestions - 1);
+		let completed = nextQuestion === (questionsData.numberOfQuestions - 1);
 		let progress = (1 + nextQuestion) / questionsData.numberOfQuestions * 100;
 		setQuestionsData({
 			...questionsData,
@@ -132,13 +135,13 @@ function Poll() {
 	}
 
 	const prevQuestion = () => {
-		if (questionsData.currentQuestion == 0){
+		if (questionsData.currentQuestion === 0){
 			navigate('/');
 		}
 
 		let nextQuestion = questionsData.currentQuestion > 0 ? (questionsData.currentQuestion - 1) : 0;
 		let progress = (1 + nextQuestion) / questionsData.numberOfQuestions * 100;
-		let completed = nextQuestion == (questionsData.numberOfQuestions - 1);
+		let completed = nextQuestion === (questionsData.numberOfQuestions - 1);
 		setQuestionsData({
 			...questionsData,
 			currentQuestion: nextQuestion,

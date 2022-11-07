@@ -27,7 +27,7 @@ h4 {
     .question-answers {
         display: flex;
         flex-direction: column;
-        max-height: 20vh;
+        // max-height: 20vh;
         min-width: 100%;
         overflow-y: scroll;
         .text-answer {

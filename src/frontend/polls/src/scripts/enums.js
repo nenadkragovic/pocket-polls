@@ -7,7 +7,7 @@ export const QuestionType = {
 
 export const questionTypeToString = (type) => {
     for (const [key, value] of Object.entries(QuestionType)) {
-        if (value == type)
+        if (value === type)
         return key.split(/(?=[A-Z])/).join(" ");
     }
 }

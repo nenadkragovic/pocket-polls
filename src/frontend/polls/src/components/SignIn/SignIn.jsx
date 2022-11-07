@@ -87,7 +87,7 @@ const SignIn = (props) => {
 					message: 'Server error. :('
 				})
 			}).catch(err => {
-				if (err.response.status == 401) {
+				if (err.response.status === 401) {
 					setValidationData({
 						open: true,
 						message: err.response.data.validationMessage
@@ -116,7 +116,7 @@ const SignIn = (props) => {
 			}
 		}).catch(err => {
 			console.log(err)
-			if (err.response.status == 400) {
+			if (err.response.status === 400) {
 				var message = err.message;
 				if (err.response?.data?.errors != null) {
 					if (err.response?.data?.errors.length > 0)

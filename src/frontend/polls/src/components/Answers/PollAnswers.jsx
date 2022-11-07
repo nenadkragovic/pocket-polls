@@ -1,8 +1,6 @@
 import React from 'react';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box'
 import { Chart } from "react-google-charts";
-import * as helper from '../../scripts/helper';
 
 export function PollAnswers (props) {
 

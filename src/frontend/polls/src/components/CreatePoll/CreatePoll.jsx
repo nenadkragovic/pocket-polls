@@ -9,10 +9,9 @@ import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import * as http from '../../scripts/http';
-import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import { QuestionType, questionTypeToString } from '../../scripts/enums';
 import CloseIcon from '@mui/icons-material/Close';
@@ -25,7 +24,6 @@ import ListItemText from '@mui/material/ListItemText';
 import * as validation from '../../scripts/helper';
 
 function CreatePoll() {
-    const navigate = useNavigate();
 
     let initData = {
         name: '',
@@ -113,8 +111,8 @@ function CreatePoll() {
             })
             return;
         }
-        if ((addQuestionData.type == QuestionType.SingleChoice ||
-            addQuestionData.QuestionType == QuestionType.MultipleChoice) &&
+        if ((addQuestionData.type === QuestionType.SingleChoice ||
+            addQuestionData.QuestionType === QuestionType.MultipleChoice) &&
             addQuestionData.choices.length < 2
             ){
             setValidationData({
@@ -303,7 +301,7 @@ function CreatePoll() {
                         </Select>
                     </FormControl>
                     {
-                        (addQuestionData.type == QuestionType.SingleChoice || addQuestionData.type == QuestionType.MultipleChoice) ?
+                        (addQuestionData.type === QuestionType.SingleChoice || addQuestionData.type === QuestionType.MultipleChoice) ?
                         <>
                             <Typography variant="p" component="div" style={{ marginTop: '1rem', marginBottom: '1rem'}}>Choices:</Typography>
                             <List>

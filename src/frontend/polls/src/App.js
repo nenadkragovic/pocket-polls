@@ -37,7 +37,7 @@ function App() {
             </Suspense>
           </> : <SignIn isLoggedAction={isLoggedAction}/>
       }
-		</BrowserRouter>
+    </BrowserRouter>
   );
 }
 

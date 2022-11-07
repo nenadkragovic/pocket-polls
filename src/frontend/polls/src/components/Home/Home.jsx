@@ -28,7 +28,7 @@ const Home = () => {
 
 	useEffect(() => {
 		fetchData(1);
-	},[]);
+	}, [null]);
 
 	const fetchData = async (page, searchParam = '') => {
 		setData({

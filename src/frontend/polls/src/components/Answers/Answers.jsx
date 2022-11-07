@@ -1,5 +1,5 @@
 import React from 'react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import  * as style from './style/answers.scss';
 import * as http from '../../scripts/http';
 import Table from '@mui/material/Table';
@@ -42,7 +42,7 @@ function Answers() {
     const [selectedPollAnswers, setSelectedPollAnswers] = React.useState(null);
 
     useEffect(() => {
-        fetchData(0, rowsPerPage);
+        fetchData(0, 5);
     },[]);
 
     const handleCloseValidationMessage = () => {
