@@ -111,7 +111,7 @@ function Answers() {
                     items: items,
                     totalRecords: polls.totalRecords - 1
                 });
-                fetchData()
+                fetchData(0, rowsPerPage);
             }).catch(err => {
                 var message = validation.getValidationMessage(err.response.data);
 
