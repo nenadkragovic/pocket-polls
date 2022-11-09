@@ -113,16 +113,21 @@ const getSubscriptions = async (offset, limit, callback) => {
 const getSubscriptionByUserId = async (userId, callback) => {
     var sql = `select Endpoint, P246dhKey, AuthKey from [dbo].[PushNotificationSubscriptions] where UserId = '${userId}';`;
     executeSQL(sql, (err, data) => {
-        let row = data[0];
-        var subscription = {
-            endpoint: row[0],
-            expirationTime: null,
-            keys: {
-              p256dh: row[1],
-              auth: row[2]
+        if (data !== undefined) {
+            let row = data[0];
+            if (row !== undefined){
+                var subscription = {
+                    endpoint: row[0],
+                    expirationTime: null,
+                    keys: {
+                      p256dh: row[1],
+                      auth: row[2]
+                    }
+                };
+                return callback(err, subscription);
             }
-        };
-        return callback(err, subscription);
+        }
+        return callback(err, 'no subscriptions found!');
     });
 }
 
@@ -159,7 +164,21 @@ amqp.connect('amqp://localhost', function (error0, connection) {
                 if (msg.content) {
                     console.log(" [x] %s", msg.content.toString());
                     const message = msg.content.toString();
-                    broadcastNotifications(message)
+                    let data = JSON.parse(message);
+                    if (data.SendToAll) {
+                        broadcastNotifications(message)
+                    }
+                    else {
+                        getSubscriptionByUserId(data.UserId, function(err, subscription) {
+                            if (err !== null) {
+                                console.error('UNABLE TO SEND NOTIFICATION TO: ', data.UserId)
+                            }
+                            else {
+                                webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}));
+                                console.log('NOTIFICATION SENT TO USER: ', data.UserId)
+                            }
+                        });
+                    }
                 }
             }
             catch (e) {
@@ -181,6 +200,7 @@ app.get('/', (req, res) =>
 app.post('/save-subscription', async (req, res) => {
     const subscription = req.body;
     let userId = req.query.userId;
+    console.log('Subscription created for user: ', userId)
     saveSubscriptionToDbForUser(subscription, userId, function(err, data) {
         if (err !== null) {
             res.status(400)
@@ -208,7 +228,7 @@ app.post('/send-notification-to-user', async (req, res) => {
             res.json({ error: err })
         }
         else {
-            console.log(subscription)
+            console.log('NOTIFICATION SENT TO USER: ', userId)
             webpush.sendNotification(subscription, JSON.stringify(message));
             res.status(200);
             res.json({ record: subscription })

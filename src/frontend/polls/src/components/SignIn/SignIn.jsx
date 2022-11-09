@@ -17,7 +17,6 @@ import * as http from '../../scripts/http';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import * as serviceWorkerRegistration from '../../serviceWorkerRegistration';
 
 const SignIn = (props) => {
 	const navigate = useNavigate();
@@ -74,12 +73,6 @@ const SignIn = (props) => {
 				{
 					localStorage.setItem('user-token', response.data.token);
 					localStorage.setItem('user-id', response.data.userId);
-					// If you want your app to work offline and load faster, you can change
-					// unregister() to register() below. Note this comes with some pitfalls.
-					// Learn more about service workers: https://cra.link/PWA
-					serviceWorkerRegistration.setUserId(response.data.userId);
-					serviceWorkerRegistration.register();
-					serviceWorkerRegistration.requestNotificationPermission();
 					props.isLoggedAction(true);
 					setData(initData);
 					navigate('/');
