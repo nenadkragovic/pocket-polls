@@ -5,6 +5,7 @@ const webpush = require('web-push')
 const amqp = require('amqplib/callback_api');
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request
+const ConsumerQueue = require('consumer-queue');
 
 const app = express()
 
@@ -27,20 +28,56 @@ webpush.setVapidDetails(
     config.privateKey
 )
 
-const broadcastNotifications = async (dataToSend) => {
+/// MESSAGES QUEUE. IF THERE IS A HUGE LOAD MESSAGES SHOULD BE DISPATCHED IN BATCHES
+const messagesToBroadcastQueue = new ConsumerQueue();
+const numberOfSubscriptionsPerRun = 3;
+var queueRunning = false;
+
+function loop() {
+    try {
+        queueRunning = true;
+        console.info('NOTIFICATION CONSUMED.')
+        return messagesToBroadcastQueue.pop().then((notification) => {
+            getSubscriptions(notification.offset, numberOfSubscriptionsPerRun, function(err, subscriptions) {
+                if (err !== null) {
+                    console.error('ERROR FETCHING SUBSCRIPTIONS ANY SUBSCRIPTIONS.');
+                    return;
+                }
+                if (subscriptions !== null) {
+                    subscriptions.forEach(subscription => {
+                        try {
+                            webpush.sendNotification(subscription, JSON.stringify(notification.message));
+                        }
+                        catch(e) { console.log(e) }
+                    });
+                }
+                notification.offset += numberOfSubscriptionsPerRun;
+                if (notification.offset < notification.total) {
+                    messagesToBroadcastQueue.push(notification)
+                    queueRunning = false;
+                    return loop();
+                }
+            });
+        });
+    }
+    catch(e) {
+        console.error(e);
+        queueRunning = false;
+    }
+}
+
+const broadcastNotifications = async (message) => {
     // TODO: perform action for each subscription
-    getSubscriptions(0, 100, function(err, data) {
+    getTotalNumberOfSubscriptions(function(err, total) {
         if (err !== null) {
-            console.log(err);
+            console.error('UNABLE TO GET SUBSCRITPIONS COUNT. MESSAGE WONT BE BROADCASTED.')
             return;
         }
-
-        if (data !== null)
-            subscriptions.forEach(subscription => {
-                webpush.sendNotification(subscription, dataToSend);
-        });
+        console.log('TOTAL: ', total)
+        messagesToBroadcastQueue.push({total: total, offset: 0, message: message})
+        if (!queueRunning)
+            loop();
     });
-
 }
 
 // ===================================================================================================================
@@ -103,10 +140,41 @@ const executeSQL = (sql, callback) => {
 };
 
 // REPOSITORY METHODS
+const getTotalNumberOfSubscriptions = async (callback) => {
+    var sql = `SELECT COUNT(*) FROM PushNotificationSubscriptions;`;
+    executeSQL(sql, (err, data) => {
+        if (data !== undefined) {
+            let row = data[0];
+            if (row !== undefined){
+                return callback(err, row[0]);
+            }
+        }
+        return callback(err, 'no subscriptions found!');
+    });
+}
+
 const getSubscriptions = async (offset, limit, callback) => {
     var sql = `SELECT Endpoint, P246dhKey, AuthKey FROM PushNotificationSubscriptions ORDER BY Id OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`;
     executeSQL(sql, (err, data) => {
-        return callback(err, data);
+        if (data !== undefined) {
+            var subscriptions = [];
+            for (var i in data) {
+                let row = data[i];
+                if (row !== undefined) {
+                    var subscription = {
+                        endpoint: row[0],
+                        expirationTime: null,
+                        keys: {
+                          p256dh: row[1],
+                          auth: row[2]
+                        }
+                    };
+                    subscriptions.push(subscription)
+                }
+            }
+            return callback(err, subscriptions);
+        }
+        return callback(err, 'no subscriptions found!');
     });
 }
 
@@ -133,7 +201,7 @@ const getSubscriptionByUserId = async (userId, callback) => {
 
 const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
     var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
-    `VALUES('${subscription.endpoint}',  '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
+    `VALUES('${subscription.endpoint}', '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
 
     executeSQL(sql, (err, data) => {
         return callback(err, data);
@@ -166,7 +234,7 @@ amqp.connect('amqp://localhost', function (error0, connection) {
                     const message = msg.content.toString();
                     let data = JSON.parse(message);
                     if (data.SendToAll) {
-                        broadcastNotifications(message)
+                        broadcastNotifications(data);
                     }
                     else {
                         getSubscriptionByUserId(data.UserId, function(err, subscription) {
@@ -175,7 +243,7 @@ amqp.connect('amqp://localhost', function (error0, connection) {
                             }
                             else {
                                 webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}));
-                                console.log('NOTIFICATION SENT TO USER: ', data.UserId)
+                                console.log('NOTIFICATION SENT TO USER: ', data.UserId);
                             }
                         });
                     }
@@ -214,7 +282,7 @@ app.post('/save-subscription', async (req, res) => {
 })
 
 app.post('/broadcast-notification', async (req, res) => {
-    const message = 'TEST MESSAGE FROM PUSH API';
+    const message = req.body;
     await broadcastNotifications(message)
     res.json({ message: 'message sent' })
 })
