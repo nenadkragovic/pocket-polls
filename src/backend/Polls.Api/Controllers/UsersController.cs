@@ -19,8 +19,6 @@ public class UsersController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> RegisterRespondent([FromBody] CreateUserDto userRegistration)
     {
-        Console.WriteLine("USO u REQ");
-
         if (!ModelState.IsValid)
         {
             BadRequest(ModelState);
@@ -38,6 +36,6 @@ public class UsersController : ControllerBase
         if (!result.Authorized)
             return Unauthorized(result);
 
-        return Ok(new TokenDto { Token = result.Token });
+        return Ok(new TokenDto { Token = result.Token, UserId = result.UserId });
     }
 }

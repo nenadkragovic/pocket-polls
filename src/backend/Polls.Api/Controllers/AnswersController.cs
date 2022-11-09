@@ -3,8 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Polls.Lib.Database;
 using Polls.Lib.Database.Models;
 using Polls.Lib.DTO;
+using Polls.Lib.MessageBrokers;
 using Polls.Lib.Repositories;
+using Polls.Lib.Repositories.Authentication;
 using Serilog;
+using System.Security.Claims;
 
 namespace Polls.Api.Controllers;
 
@@ -14,10 +17,20 @@ namespace Polls.Api.Controllers;
 public class AnswersController : ControllerBase
 {
     private readonly AnswersRepository _answersRepository;
+    private readonly IUserAuthenticationRepository _userAuthenticationRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly PushNotificationsBroker _pushNotificationsService;
 
-    public AnswersController(AnswersRepository answersRepository)
+
+    public AnswersController(AnswersRepository answersRepository,
+                             PushNotificationsBroker pushNotificationsService,
+                             IUserAuthenticationRepository userAuthenticationRepository,
+                             IHttpContextAccessor httpContextAccessor)
     {
         _answersRepository = answersRepository;
+        _pushNotificationsService = pushNotificationsService;
+        _httpContextAccessor = httpContextAccessor;
+        _userAuthenticationRepository = userAuthenticationRepository;
     }
 
     [HttpGet("{pollId}")]
@@ -43,7 +56,17 @@ public class AnswersController : ControllerBase
 
         try
         {
-            await _answersRepository.AddAnswers(Context.GetAdminId(), pollId, model);
+            var username = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Name)?.Value;
+
+            var user = await _userAuthenticationRepository.GetUserByName(username);
+
+            await _answersRepository.AddAnswers(user.Id, pollId, model);
+
+            _pushNotificationsService.PublishMessage(new BrokerMessage()
+            {
+                Title = $"New answer!",
+                Message = "Someone just answered your poll."
+            });
 
             return Ok();
         }

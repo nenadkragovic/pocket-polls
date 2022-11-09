@@ -6,8 +6,6 @@ services:
     image: mcr.microsoft.com/mssql/server:2019-latest
     ports:
       - "1433:1433"
-    volumes:
-      - ./docker-data/mssql:/var/opt/mssql
     environment:
       SA_PASSWORD: "5tgbNHY^"
       ACCEPT_EULA: "Y"

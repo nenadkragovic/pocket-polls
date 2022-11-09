@@ -68,6 +68,15 @@ namespace Polls.Lib.Database
                 SecurityStamp = string.Empty
             });
 
+            modelBuilder.Entity<PushNotificationSubscription>(entity =>
+            {
+                entity.HasOne(d => d.User)
+                   .WithOne()
+                   .HasForeignKey<PushNotificationSubscription>(d => d.UserId)
+                   .OnDelete(DeleteBehavior.NoAction)
+                   .HasConstraintName("FK_User_Push_Subscription");
+            });
+
             modelBuilder.Entity<Poll>(entity =>
             {
                 entity.HasOne(d => d.User)
