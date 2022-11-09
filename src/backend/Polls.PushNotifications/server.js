@@ -12,15 +12,15 @@ app.use(cors())
 app.use(bodyParser.json())
 const port = 4000
 
-let subscriptionsData = new Object();
-
+// ===================================================================================================================
+// CONFIGURE WEB PUSH
+// ===================================================================================================================
+//setting our previously generated VAPID keys
 var config = {
     publicKey:'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk',
     privateKey: 'ERIZmc5T5uWGeRxedxu92k3HnpVwy_RCnQfgek1x2Y4',
 };
 
-// CONFIGURE WEB PUSH
-//setting our previously generated VAPID keys
 webpush.setVapidDetails(
     'mailto:nenadkragovic@gmail.com',
     config.publicKey,
@@ -29,16 +29,23 @@ webpush.setVapidDetails(
 
 const broadcastNotifications = async (dataToSend) => {
     // TODO: perform action for each subscription
-    getSubscriptions(0, 100, function(subscriptions) {
-        if (subscriptions != null)
+    getSubscriptions(0, 100, function(err, data) {
+        if (err !== null) {
+            console.log(err);
+            return;
+        }
+
+        if (data !== null)
             subscriptions.forEach(subscription => {
                 webpush.sendNotification(subscription, dataToSend);
-            });
+        });
     });
 
 }
 
+// ===================================================================================================================
 // CONNECT TO MS SQL DB
+// ===================================================================================================================
 var TYPES = require('tedious').TYPES;
 var dbConfig = {
     server: 'localhost',
@@ -72,7 +79,6 @@ const executeSQL = (sql, callback) => {
                 console.log('Req failed: ', err)
                 return callback(err, null);
             }
-            console.log("uspeo"),
             callback(null, result);
         });
 
@@ -96,7 +102,42 @@ const executeSQL = (sql, callback) => {
     });
 };
 
-// CONECT TO RABBIT MQ
+// REPOSITORY METHODS
+const getSubscriptions = async (offset, limit, callback) => {
+    var sql = `SELECT Endpoint, P246dhKey, AuthKey FROM PushNotificationSubscriptions ORDER BY Id OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`;
+    executeSQL(sql, (err, data) => {
+        return callback(err, data);
+    });
+}
+
+const getSubscriptionByUserId = async (userId, callback) => {
+    var sql = `select Endpoint, P246dhKey, AuthKey from [dbo].[PushNotificationSubscriptions] where UserId = '${userId}';`;
+    executeSQL(sql, (err, data) => {
+        let row = data[0];
+        var subscription = {
+            endpoint: row[0],
+            expirationTime: null,
+            keys: {
+              p256dh: row[1],
+              auth: row[2]
+            }
+        };
+        return callback(err, subscription);
+    });
+}
+
+const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
+    var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
+    `VALUES('${subscription.endpoint}',  '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
+
+    executeSQL(sql, (err, data) => {
+        return callback(err, data);
+    });
+}
+
+// ===================================================================================================================
+// CONNECT TO RABBIT MQ
+// ===================================================================================================================
 amqp.connect('amqp://localhost', function (error0, connection) {
     if (error0) {
         throw error0;
@@ -130,8 +171,11 @@ amqp.connect('amqp://localhost', function (error0, connection) {
     });
 });
 
+// ===================================================================================================================
 // ADD ROUTES
-app.get('/', (req, res) => res.send('Polls notifications API. Add subscription to API and device will be notified with fresh inforamtion!'))
+// ===================================================================================================================
+app.get('/', (req, res) =>
+    res.send('Polls notifications API. Add subscription to API and device will be notified with fresh inforamtion!'))
 
 // The new /save-subscription endpoint
 app.post('/save-subscription', async (req, res) => {
@@ -149,11 +193,27 @@ app.post('/save-subscription', async (req, res) => {
     })
 })
 
-//route to test send notification
-app.get('/send-notification', async (req, res) => {
+app.post('/broadcast-notification', async (req, res) => {
     const message = 'TEST MESSAGE FROM PUSH API';
     await broadcastNotifications(message)
     res.json({ message: 'message sent' })
+})
+
+app.post('/send-notification-to-user', async (req, res) => {
+    const message = req.body;
+    let userId = req.query.userId;
+    getSubscriptionByUserId(userId, function(err, subscription) {
+        if (err !== null) {
+            res.status(400)
+            res.json({ error: err })
+        }
+        else {
+            console.log(subscription)
+            webpush.sendNotification(subscription, JSON.stringify(message));
+            res.status(200);
+            res.json({ record: subscription })
+        }
+    });
 })
 
 app.get('/get-subscriptions', async (req, res) => {
@@ -161,29 +221,3 @@ app.get('/get-subscriptions', async (req, res) => {
 })
 
 app.listen(port, () => console.log(`Notifications server listening on port ${port}!`))
-
-// OTHER METHODS
-const getSubscriptions = async (offset, limit, callback) => {
-    let subs = [];
-    for(var key in subscriptionsData) {
-        subs.push(subscriptionsData[key]);
-      }
-
-      executeSQL("SELECT * from [dbo].[Users]", (err, data) => {
-        if (err)
-          console.error(err);
-        console.log(data);
-        callback(data)
-        return;
-      });
-    return;
-}
-
-const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
-    var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
-    `VALUES('${subscription.endpoint}',  '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
-
-    executeSQL(sql, (err, data) => {
-        return callback(err, data);
-    });
-}

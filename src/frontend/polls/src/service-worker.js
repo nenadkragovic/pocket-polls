@@ -122,6 +122,7 @@ self.addEventListener('activate', async () => {
 
 self.addEventListener('push', function(event) {
   if (event.data) {
+    console.log(data)
     console.log('Push event: ', event.data.text())
     let data = JSON.parse(event.data.text());
     showLocalNotification(data.Title, data.Message, self.registration)

@@ -15,7 +15,6 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import Skeleton from '@mui/material/Skeleton';
 import { useNavigate } from 'react-router-dom';
-import * as serviceWorkerRegistration from '../../serviceWorkerRegistration';
 
 const Home = () => {
 	const navigate = useNavigate();
@@ -29,13 +28,6 @@ const Home = () => {
 
 	useEffect(() => {
 		fetchData(1);
-		let userId = localStorage.getItem('user-id');
-		// If you want your app to work offline and load faster, you can change
-		// unregister() to register() below. Note this comes with some pitfalls.
-		// Learn more about service workers: https://cra.link/PWA
-		serviceWorkerRegistration.setUserId(userId);
-		serviceWorkerRegistration.register();
-		serviceWorkerRegistration.requestNotificationPermission();
 	}, [null]);
 
 	const fetchData = async (page, searchParam = '') => {

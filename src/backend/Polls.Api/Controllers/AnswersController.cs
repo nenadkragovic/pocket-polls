@@ -60,12 +60,14 @@ public class AnswersController : ControllerBase
 
             var user = await _userAuthenticationRepository.GetUserByName(username);
 
-            await _answersRepository.AddAnswers(user.Id, pollId, model);
+            var ownerId = await _answersRepository.AddAnswers(user.Id, pollId, model);
 
             _pushNotificationsService.PublishMessage(new BrokerMessage()
             {
                 Title = $"New answer!",
-                Message = "Someone just answered your poll."
+                Message = "Someone just answered your poll.",
+                SendToAll = false,
+                UserId = ownerId,
             });
 
             return Ok();
