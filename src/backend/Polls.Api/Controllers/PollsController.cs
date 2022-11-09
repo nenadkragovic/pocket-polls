@@ -72,12 +72,6 @@ public class PollsController : ControllerBase
 
         if (result != null)
         {
-            _pushNotificationsService.PublishMessage(new BrokerMessage()
-            {
-                Title = "Polls listed on device.",
-                Message = "Someone listed polls"
-            });
-
             return Ok(result);
         }
 
@@ -97,6 +91,13 @@ public class PollsController : ControllerBase
         var user = await _userAuthenticationRepository.GetUserByName(username);
 
         var poll = await _pollsRepository.AddPoll(user.Id, model);
+
+
+        _pushNotificationsService.PublishMessage(new BrokerMessage()
+        {
+            Title = $"New poll created: {poll.Name}",
+            Message = poll.Description
+        });
 
         return Created($"polls/{poll?.Id}", poll);
 

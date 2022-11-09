@@ -35,5 +35,6 @@ namespace Polls.Lib.DTO
     public class TokenDto
     {
         public string Token { get; set; }
+        public Guid UserId { get; set; }
     }
 }

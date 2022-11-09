@@ -68,7 +68,8 @@ namespace Polls.Lib.Repositories.Authentication
             return new UserValidationResult()
             {
                 Authorized = true,
-                Token = token
+                Token = token,
+                UserId = user.Id
             };
         }
         public Task<User> GetUserByName(string username)

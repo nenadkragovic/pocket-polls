@@ -14,8 +14,16 @@ namespace Polls.Lib.Repositories
             _context = context;
         }
 
-        public async Task AddAnswers(Guid userId, long pollId, AddAnswersDto model)
+        /// <summary>
+        /// Add anser
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="pollId"></param>
+        /// <param name="model"></param>
+        /// <returns>Returns owner ID</returns>
+        public async Task<Guid> AddAnswers(Guid userId, long pollId, AddAnswersDto model)
         {
+
             _context.YesNoAnswers.AddRange(model.YesNoAnswers.Select(a => new YesNoAnswer()
             {
                 UserId = userId,
@@ -52,6 +60,13 @@ namespace Polls.Lib.Repositories
             }));
 
             await _context.SaveChangesAsync();
+
+            var ownerId = await _context.Polls.AsNoTracking()
+                .Where(p => p.Id == pollId)
+                .Select(p => p.UserId)
+                .FirstOrDefaultAsync();
+
+            return ownerId;
         }
 
         public async Task<GetAnswersDto> GetAnswersByPollId(long pollId)

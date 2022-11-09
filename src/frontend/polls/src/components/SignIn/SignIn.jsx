@@ -72,6 +72,7 @@ const SignIn = (props) => {
 				if (response.status === 200 && response.data.token !== null)
 				{
 					localStorage.setItem('user-token', response.data.token);
+					localStorage.setItem('user-id', response.data.userId);
 					props.isLoggedAction(true);
 					setData(initData);
 					navigate('/');
