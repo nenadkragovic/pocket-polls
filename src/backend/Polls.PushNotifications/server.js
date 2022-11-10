@@ -54,9 +54,10 @@ function loop() {
                 notification.offset += numberOfSubscriptionsPerRun;
                 if (notification.offset < notification.total) {
                     messagesToBroadcastQueue.push(notification)
-                    queueRunning = false;
-                    return loop();
                 }
+
+                queueRunning = false;
+                return loop();
             });
         });
     }
