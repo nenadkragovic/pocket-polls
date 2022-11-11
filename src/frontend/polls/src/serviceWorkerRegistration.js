@@ -51,7 +51,9 @@ export function register(config) {
     }
 
     window.addEventListener('load', () => {
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${userId}`;
+      let publicKey = 'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk';
+      let apiUrl = 'http://localhost:4000';
+      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${userId}&notificationsApiUrl=${apiUrl}&publicKey=${publicKey}`;
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.

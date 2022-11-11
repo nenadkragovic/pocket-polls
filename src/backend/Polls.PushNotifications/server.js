@@ -8,7 +8,7 @@ var Request = require('tedious').Request
 
 // CONFIG:
 const {
-    PORT = 400,
+    PORT = 4000,
     WEB_PUSH_PUBLIC_KEY = 'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk',
     WEB_PUSH_PRIVATE_KEY = 'ERIZmc5T5uWGeRxedxu92k3HnpVwy_RCnQfgek1x2Y4',
     MS_SQL_SERVER = 'localhost',
@@ -206,11 +206,23 @@ const getSubscriptionByUserId = async (userId, callback) => {
 }
 
 const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
-    var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
-    `VALUES('${subscription.endpoint}', '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
+    executeSQL(`SELECT * FROM [dbo].[PushNotificationSubscriptions] WHERE UserId='${userId}'`, (err, data) => {
 
-    executeSQL(sql, (err, data) => {
-        return callback(err, data);
+        var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
+        `VALUES('${subscription.endpoint}', '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
+
+        if (data !== undefined) {
+            let row = data[0];
+            if (row !== undefined) {
+                console.warn(`SUBSCRIPTION FOR USER: ${userId} ALREADY EXISTS, IT WILL BE UPDATED.`);
+                var sql = "UPDATE [dbo].[PushNotificationSubscriptions] SET " +
+                `Endpoint='${subscription.endpoint}', P246dhKey='${subscription.keys.p256dh}', AuthKey='${subscription.keys.auth}';`;
+            }
+        }
+
+        executeSQL(sql, (err, data) => {
+            return callback(err, data);
+        });
     });
 }
 
@@ -285,13 +297,13 @@ app.get('/', (req, res) =>
 app.post('/save-subscription', async (req, res) => {
     const subscription = req.body;
     let userId = req.query.userId;
-    console.log('Subscription created for user: ', userId)
     saveSubscriptionToDbForUser(subscription, userId, function(err, data) {
         if (err !== null) {
             res.status(400)
             res.json({ error: err })
         }
         else {
+            console.log('SUBSCRIPTION CREATED FOR USER: ', userId)
             res.status(201);
             res.json({ record: data })
         }

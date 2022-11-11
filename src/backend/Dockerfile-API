@@ -17,4 +17,7 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
 
+RUN dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p 5tgbNHY^
+RUN dotnet dev-certs https --trust
+
 ENTRYPOINT ["dotnet", "Polls.Api.dll"]

@@ -94,35 +94,40 @@ const urlB64ToUint8Array = base64String => {
 
 const saveSubscription = async subscription => {
   let userId = new URL(location).searchParams.get('userId');
-  const SERVER_URL = `http://localhost:4000/save-subscription?userId=${userId}`
-  const response = await fetch(SERVER_URL, {
+  let notificationsApiUrl = new URL(location).searchParams.get('notificationsApiUrl');
+  const SERVER_URL = `${notificationsApiUrl}/save-subscription?userId=${userId}`;
+
+  return await fetch(SERVER_URL, {
     method: 'post',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(subscription),
   })
-  return response
 }
 
 self.addEventListener('activate', async () => {
   // This will be called only once when the service worker is installed for first time.
   try {
-    const applicationServerKey = urlB64ToUint8Array(
-      'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk'
-    )
+    let publicKey = new URL(location).searchParams.get('publicKey');
+    const applicationServerKey = urlB64ToUint8Array(publicKey)
     const options = { applicationServerKey, userVisibleOnly: true }
     const subscription = await self.registration.pushManager.subscribe(options)
     const response = await saveSubscription(subscription)
-    console.log(response)
+    if (response.status === 201) {
+      console.info('SUBSCIBED TO PUSH NOTIFICATIONS SERVER!')
+    }
+    else {
+      console.err('FAILED TO SUBSCIBE TO PUSH NOTIFICATIONS SERVER!')
+    }
+
   } catch (err) {
-    console.log('Error', err)
+    console.err('Error', err)
   }
 })
 
 self.addEventListener('push', function(event) {
   if (event.data) {
-    console.log(data)
     console.log('Push event: ', event.data.text())
     let data = JSON.parse(event.data.text());
     showLocalNotification(data.Title, data.Message, self.registration)
@@ -138,6 +143,7 @@ const showLocalNotification = (title, body, swRegistration) => {
   swRegistration.showNotification(title, options)
 }
 
+// KEEP ALIVE SERVICE WORKER
 setInterval(function(){
   fetch('/ping.txt')
 }, 8000)
