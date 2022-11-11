@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseUrl ='https://localhost:7288/api/';
+const baseUrl ='http://192.168.1.211:5000/api/';
 
 export const request = async (url, method, data) => {
 	return await axios({

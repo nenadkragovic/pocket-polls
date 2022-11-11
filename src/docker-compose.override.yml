@@ -12,7 +12,7 @@ services:
       - InMemoryDatabase=false
       - JwtConfig__Key=JwtTokenClientSettings123456
       - JwtConfig__expiresIn=99999
-      - RabbitMqSettings__RabbitMqConnectionSettings__Hostname=rabbitmq
+      - RabbitMqSettings__Hostname=rabbitmq
     ports:
       - "5000:80"
   sql-server:

@@ -27,8 +27,8 @@ services:
  polls-api:
     image: polls-api
     build:
-      context: backend/Polls.Api
-      dockerfile: Dockerfile
+      context: backend
+      dockerfile: Dockerfile-API
     depends_on:
       - sql-server
       - rabbitmq
