@@ -45,7 +45,7 @@ const Home = () => {
 		// 	localStorage.setItem('registred-to-push-notifications');
 		// }
 
-	}, [null]);
+	}, []);
 
 	const fetchData = async (page, searchParam = '') => {
 		setData({
