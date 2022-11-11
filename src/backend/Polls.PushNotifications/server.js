@@ -6,34 +6,39 @@ const amqp = require('amqplib/callback_api');
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request
 
-const app = express()
+// CONFIG:
+const {
+    PORT = 400,
+    WEB_PUSH_PUBLIC_KEY = 'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk',
+    WEB_PUSH_PRIVATE_KEY = 'ERIZmc5T5uWGeRxedxu92k3HnpVwy_RCnQfgek1x2Y4',
+    MS_SQL_SERVER = 'localhost',
+    MS_SQL_USERNAME = 'sa',
+    MS_SQL_PASSWORD = '5tgbNHY^',
+    MS_SQL_DB = 'PollsDb',
+    RABBIT_MQ_SERVER_URL = 'localhost',
+    NUMBER_OF_SUBSCRIPTIONS_PER_BROADCAST = 3
+  } = process.env;
 
+// CONFIGURE SERVER:
+const app = express()
 app.use(cors())
 app.use(bodyParser.json())
-const port = 4000
-
 var publicChannel = null;
 
 // ===================================================================================================================
 // CONFIGURE WEB PUSH
 // ===================================================================================================================
 //setting our previously generated VAPID keys
-var config = {
-    publicKey:'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk',
-    privateKey: 'ERIZmc5T5uWGeRxedxu92k3HnpVwy_RCnQfgek1x2Y4',
-};
 
 webpush.setVapidDetails(
     'mailto:nenadkragovic@gmail.com',
-    config.publicKey,
-    config.privateKey
+    WEB_PUSH_PUBLIC_KEY,
+    WEB_PUSH_PRIVATE_KEY
 )
-
-const numberOfSubscriptionsPerRun = 3;
 
 const broadcastMessage = (notification) => {
     try {
-        getSubscriptions(notification.offset, numberOfSubscriptionsPerRun, function(err, subscriptions) {
+        getSubscriptions(notification.offset, NUMBER_OF_SUBSCRIPTIONS_PER_BROADCAST, function(err, subscriptions) {
             if (err !== null) {
                 console.error('ERROR FETCHING ANY SUBSCRIPTIONS.');
                 return;
@@ -46,7 +51,7 @@ const broadcastMessage = (notification) => {
                     catch(e) { console.log(e) }
                 });
             }
-            notification.offset += numberOfSubscriptionsPerRun;
+            notification.offset += NUMBER_OF_SUBSCRIPTIONS_PER_BROADCAST;
             if (notification.offset < notification.total) {
                 publicChannel.sendToQueue('buffer-exchange', Buffer.from(JSON.stringify(notification)));
             }
@@ -86,18 +91,18 @@ const pushMessageToUser = (data) => {
 // ===================================================================================================================
 
 var dbConfig = {
-    server: 'localhost',
+    server: MS_SQL_SERVER,
     authentication: {
         type: 'default',
         options: {
-            userName: 'sa',
-            password: '5tgbNHY^',
+            userName: MS_SQL_USERNAME,
+            password: MS_SQL_PASSWORD,
             trustServerCertificate: true
         }
     },
     options: {
         encrypt: false,
-        database: 'PollsDb'
+        database: MS_SQL_DB
     }
 };
 
@@ -212,7 +217,7 @@ const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
 // ===================================================================================================================
 // CONNECT TO RABBIT MQ
 // ===================================================================================================================
-amqp.connect('amqp://localhost', function (error0, connection) {
+amqp.connect(`amqp://${RABBIT_MQ_SERVER_URL}`, function (error0, connection) {
     if (error0) {
         throw error0;
     }
@@ -320,4 +325,5 @@ app.get('/get-subscriptions', async (req, res) => {
     getSubscriptions(0, 5, function(result) { res.json({ record: result }) })
 })
 
-app.listen(port, () => console.log(`Notifications server listening on port ${port}!`))
+// START SERVER
+app.listen(PORT, () => console.log(`Notifications server listening on port ${PORT}!`))

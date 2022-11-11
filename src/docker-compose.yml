@@ -32,14 +32,23 @@ services:
     depends_on:
       - sql-server
       - rabbitmq
+ push-notifications-api:
+    image: push-notifications-api
+    build:
+      context: backend/Polls.PushNotifications
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
  polls-gui:
     image: polls-gui
     build:
-      context: frontend/
+      context: frontend/polls
       dockerfile: Dockerfile
     depends_on:
       - sql-server
       - rabbitmq
       - polls-api
+      - push-notifications-api
 volumes:
   data:
