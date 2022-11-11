@@ -5,13 +5,14 @@ const webpush = require('web-push')
 const amqp = require('amqplib/callback_api');
 var Connection = require('tedious').Connection;
 var Request = require('tedious').Request
-const ConsumerQueue = require('consumer-queue');
 
 const app = express()
 
 app.use(cors())
 app.use(bodyParser.json())
 const port = 4000
+
+var publicChannel = null;
 
 // ===================================================================================================================
 // CONFIGURE WEB PUSH
@@ -28,62 +29,62 @@ webpush.setVapidDetails(
     config.privateKey
 )
 
-/// MESSAGES QUEUE. IF THERE IS A HUGE LOAD MESSAGES SHOULD BE DISPATCHED IN BATCHES
-const messagesToBroadcastQueue = new ConsumerQueue();
 const numberOfSubscriptionsPerRun = 3;
-var queueRunning = false;
 
-function loop() {
+const broadcastMessage = (notification) => {
     try {
-        queueRunning = true;
-        console.info('NOTIFICATION CONSUMED.')
-        return messagesToBroadcastQueue.pop().then((notification) => {
-            getSubscriptions(notification.offset, numberOfSubscriptionsPerRun, function(err, subscriptions) {
-                if (err !== null) {
-                    console.error('ERROR FETCHING SUBSCRIPTIONS ANY SUBSCRIPTIONS.');
-                    return;
-                }
-                if (subscriptions !== null) {
-                    subscriptions.forEach(subscription => {
-                        try {
-                            webpush.sendNotification(subscription, JSON.stringify(notification.message));
-                        }
-                        catch(e) { console.log(e) }
-                    });
-                }
-                notification.offset += numberOfSubscriptionsPerRun;
-                if (notification.offset < notification.total) {
-                    messagesToBroadcastQueue.push(notification)
-                    queueRunning = false;
-                    return loop();
-                }
-            });
+        getSubscriptions(notification.offset, numberOfSubscriptionsPerRun, function(err, subscriptions) {
+            if (err !== null) {
+                console.error('ERROR FETCHING ANY SUBSCRIPTIONS.');
+                return;
+            }
+            if (subscriptions !== null) {
+                subscriptions.forEach(subscription => {
+                    try {
+                        webpush.sendNotification(subscription, JSON.stringify(notification.message));
+                    }
+                    catch(e) { console.log(e) }
+                });
+            }
+            notification.offset += numberOfSubscriptionsPerRun;
+            if (notification.offset < notification.total) {
+                publicChannel.sendToQueue('buffer-exchange', Buffer.from(JSON.stringify(notification)));
+            }
         });
     }
     catch(e) {
         console.error(e);
-        queueRunning = false;
     }
 }
 
-const broadcastNotifications = async (message) => {
+const addMessageToBroadcastQueue = async (message) => {
     // TODO: perform action for each subscription
     getTotalNumberOfSubscriptions(function(err, total) {
         if (err !== null) {
             console.error('UNABLE TO GET SUBSCRITPIONS COUNT. MESSAGE WONT BE BROADCASTED.')
             return;
         }
-        console.log('TOTAL: ', total)
-        messagesToBroadcastQueue.push({total: total, offset: 0, message: message})
-        if (!queueRunning)
-            loop();
+        console.log('PUBLISHING BROADCAST MESSAGE TO QUEUE, TOTAL SUBSCRIPTIONS: ', total)
+        publicChannel.sendToQueue('buffer-exchange', Buffer.from(JSON.stringify({total: total, offset: 0, message: message})));
+    });
+}
+
+const pushMessageToUser = (data) => {
+    getSubscriptionByUserId(data.UserId, function(err, subscription) {
+        if (err !== null) {
+            console.error('UNABLE TO SEND NOTIFICATION TO: ', data.UserId)
+        }
+        else {
+            webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}));
+            console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+        }
     });
 }
 
 // ===================================================================================================================
 // CONNECT TO MS SQL DB
 // ===================================================================================================================
-var TYPES = require('tedious').TYPES;
+
 var dbConfig = {
     server: 'localhost',
     authentication: {
@@ -222,6 +223,7 @@ amqp.connect('amqp://localhost', function (error0, connection) {
         }
 
         console.log('Connected to Rabbit MQ');
+        publicChannel = channel;
 
         channel.assertExchange('push-notifications-exchange', 'direct', { durable: false });
         channel.assertQueue('push-notifications-exchange', { durable: true });
@@ -230,23 +232,33 @@ amqp.connect('amqp://localhost', function (error0, connection) {
             try
             {
                 if (msg.content) {
-                    console.log(" [x] %s", msg.content.toString());
-                    const message = msg.content.toString();
-                    let data = JSON.parse(message);
+                    console.log("CONSUMED MESSAGE FROM API:", msg.content.toString());
+                    let data = JSON.parse(msg.content.toString());
                     if (data.SendToAll) {
-                        broadcastNotifications(data);
+                        addMessageToBroadcastQueue(data);
                     }
                     else {
-                        getSubscriptionByUserId(data.UserId, function(err, subscription) {
-                            if (err !== null) {
-                                console.error('UNABLE TO SEND NOTIFICATION TO: ', data.UserId)
-                            }
-                            else {
-                                webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}));
-                                console.log('NOTIFICATION SENT TO USER: ', data.UserId);
-                            }
-                        });
+                        pushMessageToUser(data);
                     }
+                }
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }, {
+            noAck: true
+        });
+
+        channel.assertExchange('buffer-exchange', 'direct', { durable: true});
+        channel.assertQueue('buffer-exchange', { durable: true });
+        channel.bindQueue('buffer-exchange', 'buffer-exchange', '');
+        channel.consume('buffer-exchange', function (msg) {
+            try
+            {
+                if (msg.content) {
+                    console.log("CONSUMED BUFFER: %s", msg.content.toString());
+                    let notification = JSON.parse(msg.content.toString());
+                    broadcastMessage(notification);
                 }
             }
             catch (e) {
@@ -283,7 +295,7 @@ app.post('/save-subscription', async (req, res) => {
 
 app.post('/broadcast-notification', async (req, res) => {
     const message = req.body;
-    await broadcastNotifications(message)
+    await addMessageToBroadcastQueue(message)
     res.json({ message: 'message sent' })
 })
 
