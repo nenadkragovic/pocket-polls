@@ -15,4 +15,5 @@ React PWA playground
 5. Answer - Respondant answer to specific question
 
 
-## Sources
+## Architecture
+![alt text](architecture.svg)
