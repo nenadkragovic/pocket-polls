@@ -83,7 +83,6 @@ function Answers() {
     };
 
     const handleChange = async (e, p) => {
-        console.log(p);
         setPage(p);
         await fetchData(rowsPerPage*p, rowsPerPage);
     }

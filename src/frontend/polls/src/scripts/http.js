@@ -1,10 +1,10 @@
 import axios from 'axios';
 
-const { BASE_URL ='http://192.168.1.211:5000/api/' } = process.env
+const { API_BASE_URL ='http://192.168.1.211:5000' } = process.env
 
 export const request = async (url, method, data) => {
 	return await axios({
-		url: BASE_URL + url,
+		url: `${API_BASE_URL}/api/${url}`,
 		method: method,
 		data: data,
 		timeout: 5000,

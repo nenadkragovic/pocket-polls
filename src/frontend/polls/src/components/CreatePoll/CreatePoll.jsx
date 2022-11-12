@@ -102,7 +102,6 @@ function CreatePoll() {
     }
 
     const addQuestion = () => {
-        console.log(data);
         if (addQuestionData.text === '' || addQuestionData.text.length < 5){
             setValidationData({
                 open: true,
@@ -134,7 +133,6 @@ function CreatePoll() {
             numberOfQustions: questions.length
         });
         setTimeout(() => {setAddQuestionData(addQuestionInitData)}, 100);
-        console.log(data)
     }
 
     const submit = async () => {

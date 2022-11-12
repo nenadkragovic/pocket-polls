@@ -147,7 +147,8 @@ self.addEventListener('push', function(event) {
 const showLocalNotification = (title, body, swRegistration) => {
   const options = {
     body,
-    // here you can add more properties like icon, image, vibrate, etc.
+    icon: `${process.env.PUBLIC_URL}/logo192.png`,
+    vibrate: true
   }
   swRegistration.showNotification(title, options)
 }

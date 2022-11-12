@@ -107,7 +107,8 @@ function Poll() {
 					...questionsData,
 					questions: questions,
 					numberOfQuestions: questions.length,
-					progress: 1 / questions.length * 100
+					progress: 1 / questions.length * 100,
+					completed: questions.length === 1 ? true : false
 				})
 
 				setAnswers({
@@ -192,7 +193,6 @@ function Poll() {
 		return answers.singleChoiceAnswers[objIndex].choiceId;
 	}
 	const setSingleChoiceAnswer = (questionId, choiceId) => {
-		console.log(choiceId);
 		setAnswers(prevState => {
 			let objIndex = prevState.singleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
 			let arr = prevState.singleChoiceAnswers;
@@ -210,7 +210,6 @@ function Poll() {
 	}
 
 	const setMultipleChoiceStatus = (questionId, choiceId, add) => {
-		console.log(choiceId);
 		setAnswers(prevState => {
 			let objIndex = prevState.multipleChoiceAnswers.findIndex((obj => obj.questionId === questionId));
 			let arr = prevState.multipleChoiceAnswers;
@@ -240,7 +239,6 @@ function Poll() {
 				 textAnswers: arr
 			}
 		 })
-		 console.log(answers)
 	}
 
 	function Question(props) {
