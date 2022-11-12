@@ -13,6 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { NavLink } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import * as serviceWorkerRegistration from '../../serviceWorkerRegistration';
 
 const pages = [{name: 'Home', url: '/'}, {name: 'Answers', url: '/answers'}, {name: 'Create Poll', url: '/createpoll'}];
 
@@ -35,8 +36,9 @@ const ResponsiveAppBar = (props) => {
   const logOut = () => {
     localStorage.removeItem('user-token');
     props.isLoggedAction(false);
-    navigate('/signin');
     handleCloseNavMenu();
+    serviceWorkerRegistration.unregister();
+    navigate('/signin');
   }
 
   const handleCloseUserMenu = () => {

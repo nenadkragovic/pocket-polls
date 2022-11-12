@@ -98,7 +98,6 @@ const urlB64ToUint8Array = base64String => {
 }
 
 const createOrUpdatePushSubscription = async () => {
-
   try {
     const applicationServerKey = urlB64ToUint8Array(WEB_PUSH_PUBLIC_KEY)
     const options = { applicationServerKey, userVisibleOnly: true }
@@ -116,10 +115,10 @@ const createOrUpdatePushSubscription = async () => {
     })
 
     if (response.status === 201) {
-      console.info('SUBSCIBED TO PUSH NOTIFICATIONS SERVER!')
+      console.info('SUBSCRIBED TO PUSH NOTIFICATIONS SERVER!')
     }
     else {
-      console.err('FAILED TO SUBSCIBE TO PUSH NOTIFICATIONS SERVER!')
+      console.err('FAILED TO SUBSCRIBE TO PUSH NOTIFICATIONS SERVER!')
     }
 
   } catch (err) {
