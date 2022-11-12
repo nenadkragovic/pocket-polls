@@ -46,7 +46,13 @@ const broadcastMessage = (notification) => {
             if (subscriptions !== null) {
                 subscriptions.forEach(subscription => {
                     try {
-                        webpush.sendNotification(subscription, JSON.stringify(notification.message));
+                        webpush.sendNotification(subscription, JSON.stringify(notification.message))
+                        .then(() => {
+                            console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+                        })
+                        .catch((e) => {
+                            console.log('NOTIFICATION IS NOT SENT TO USER: ', data.UserId);
+                        });
                     }
                     catch(e) { console.log(e) }
                 });
@@ -80,8 +86,18 @@ const pushMessageToUser = (data) => {
             console.error('UNABLE TO SEND NOTIFICATION TO: ', data.UserId)
         }
         else {
-            webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}));
-            console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+            try {
+                webpush.sendNotification(subscription, JSON.stringify({Message: data.Message, Title: data.Title}))
+                .then(() => {
+                    console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+                })
+                .catch((e) => {
+                    console.log('NOTIFICATION IS NOT SENT TO USER: ', data.UserId);
+                });
+            }
+            catch (e) {
+                console.log(e);
+            }
         }
     });
 }
@@ -211,7 +227,7 @@ const saveSubscriptionToDbForUser = (subscription, userId, callback) => {
         var sql = "INSERT INTO [dbo].[PushNotificationSubscriptions] ([Endpoint],[P246dhKey],[AuthKey],[UserId])" +
         `VALUES('${subscription.endpoint}', '${subscription.keys.p256dh}', '${subscription.keys.auth}', '${userId}');`;
 
-        if (data !== undefined) {
+        if (data != null && data !== undefined) {
             let row = data[0];
             if (row !== undefined) {
                 console.warn(`SUBSCRIPTION FOR USER: ${userId} ALREADY EXISTS, IT WILL BE UPDATED.`);
@@ -325,8 +341,13 @@ app.post('/send-notification-to-user', async (req, res) => {
             res.json({ error: err })
         }
         else {
-            console.log('NOTIFICATION SENT TO USER: ', userId)
-            webpush.sendNotification(subscription, JSON.stringify(message));
+            try {
+                webpush.sendNotification(subscription, JSON.stringify(message));
+                console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+            }
+            catch (e) {
+                console.log(e);
+            }
             res.status(200);
             res.json({ record: subscription })
         }

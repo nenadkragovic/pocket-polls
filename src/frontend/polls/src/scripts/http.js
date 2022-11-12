@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL ='http://192.168.1.211:5000/api/';
+const { BASE_URL ='http://192.168.1.211:5000/api/' } = process.env
 
 export const request = async (url, method, data) => {
 	return await axios({

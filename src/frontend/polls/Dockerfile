@@ -1,30 +1,20 @@
-# base image
-FROM node:13.3.0-alpine3.10 as build
 
-# set working directory
+# ==== CONFIGURE =====
+# Use a Node 16 base image
+FROM node:16-alpine
+# Set the working directory to /app inside the container
 WORKDIR /app
-
-# add `/app/node_modules/.bin` to $PATH
-ENV PATH /app/node_modules/.bin:$PATH
-
-# install and cache app dependencies
+# Copy app files
 COPY . .
-
-RUN npm install
-RUN node i -g serve
+# ==== BUILD =====
+# Install dependencies (npm ci makes sure the exact versions in the lockfile gets installed)
+RUN npm i -g
+# Build the app
 RUN npm run build
-RUN serve -s build
-
-FROM nginx:alpine as server
-
-WORKDIR /home
-
-COPY --from=build /app .
-
-COPY nginx.conf /etc/nginx/
-
-RUN cp -a public/* /usr/share/ngnix/html
+# ==== RUN =======
+# Set the env to "production"
+ENV NODE_ENV production
 
 EXPOSE 3000
-
-ENTRYPOINT ["nginx"]
+# Start the app
+CMD [ "npx", "serve", "build" ]

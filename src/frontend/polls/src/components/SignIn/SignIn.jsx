@@ -2,6 +2,7 @@ import React from 'react';
 import { useState } from 'react';
 import './style/signIn.scss';
 import Box from '@mui/material/Box';
+import CircularProgress from '@mui/material/CircularProgress';
 import Container from '@mui/material/Container';
 import FormControl from '@mui/material/FormControl';
 import Button from '@mui/material/Button';
@@ -17,6 +18,7 @@ import * as http from '../../scripts/http';
 import { useNavigate } from 'react-router-dom';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import * as serviceWorkerRegistration from '../../serviceWorkerRegistration';
 
 const SignIn = (props) => {
 	const navigate = useNavigate();
@@ -33,6 +35,7 @@ const SignIn = (props) => {
 	}
 
 	const [data, setData] = useState(initData);
+	const [loading, setLoading] = useState(false);
 
 	const [validationData, setValidationData] = useState({
 		open: false,
@@ -65,6 +68,9 @@ const SignIn = (props) => {
 	}
 
 	const logIn = async () => {
+		if (loading)
+			return;
+		setLoading(true);
 		await http.request('users/login', 'POST', {
 				userName: data.username,
 				password: data.password
@@ -72,9 +78,20 @@ const SignIn = (props) => {
 				if (response.status === 200 && response.data.token !== null)
 				{
 					localStorage.setItem('user-token', response.data.token);
-					localStorage.setItem('user-id', response.data.userId);
-					props.isLoggedAction(true);
+
+					serviceWorkerRegistration.register({
+						userId: response.data.userId,
+						onUpdate: function(registration) {
+							console.log('Service worker registred successfully');
+						},
+						onSuccess: function(registration) {
+							console.log('Service worker updated successfully');
+						}
+					});
+					serviceWorkerRegistration.requestNotificationPermission();
+
 					setData(initData);
+					props.isLoggedAction(true);
 					navigate('/');
 				}
 				else if (response.response.status === 401) {
@@ -101,9 +118,15 @@ const SignIn = (props) => {
 					message: 'Server error. :('
 				})
 			})
+			.finally(() => {
+				setLoading(false);
+			})
 	}
 
 	const register = async () => {
+		if (loading)
+			return;
+		setLoading(true);
 		await http.request('users/register', 'POST', {
 			userName: data.username,
 			password: data.password,
@@ -113,6 +136,7 @@ const SignIn = (props) => {
 		}).then(response => {
 			if (response.status === 201)
 			{
+				setLoading(false);
 				logIn();
 			}
 		}).catch(err => {
@@ -143,6 +167,9 @@ const SignIn = (props) => {
 				open: true,
 				message: 'Server error. :('
 			})
+		})
+		.finally(() => {
+			setLoading(false);
 		})
 	}
 
@@ -183,7 +210,9 @@ const SignIn = (props) => {
 							label="Password"/>
 					</FormControl>
 					<FormControl className="form-control">
-						<Button variant="contained" onClick={logIn}>Log in</Button>
+						<Button variant="contained" onClick={logIn}>
+							{ loading ? <CircularProgress style={{color: 'white', width: '1.5em', height: '1.5rem'}}/> : 'Log in'}
+						</Button>
 					</FormControl>
 					<FormControl className="form-control">
 						<FormLabel variant="contained" onClick={constSwitchForms}>Don't have account? Register.</FormLabel>
@@ -251,7 +280,9 @@ const SignIn = (props) => {
 						/>
 					</FormControl>
 					<FormControl className="form-control">
-						<Button variant="contained" onClick={register}>Register</Button>
+						<Button variant="contained" onClick={register}>
+							{ loading ? <CircularProgress style={{color: 'white', width: '1.5em', height: '1.5rem'}}/> : 'Register'}
+						</Button>
 					</FormControl>
 					<FormControl className="form-control">
 						<FormLabel variant="contained" onClick={constSwitchForms}>Already have account? Log in.</FormLabel>

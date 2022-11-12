@@ -10,12 +10,6 @@
 // To learn more about the benefits of this model and instructions on how to
 // opt-in, read https://cra.link/PWA
 
-let userId = '';
-
-export const setUserId = (id) => {
-  userId = id;
-}
-
 export const urlB64ToUint8Array = (base64String) => {
   const padding = '='.repeat((4 - base64String.length % 4) % 4);
   const base64 = (base64String + padding)
@@ -50,10 +44,7 @@ export function register(config) {
       return;
     }
 
-    window.addEventListener('load', () => {
-      let publicKey = 'BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk';
-      let apiUrl = 'http://localhost:4000';
-      const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${userId}&notificationsApiUrl=${apiUrl}&publicKey=${publicKey}`;
+    const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${config.userId}`;
 
       if (isLocalhost) {
         // This is running on localhost. Let's check if a service worker still exists or not.
@@ -71,7 +62,6 @@ export function register(config) {
         // Is not localhost. Just register service worker
         registerValidSW(swUrl, config);
       }
-    });
   }
   else{
     console.error('Service worker not available in navigator!');
