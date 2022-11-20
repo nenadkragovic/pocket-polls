@@ -3,11 +3,12 @@ version: '3.4'
 services:
   polls-gui:
     environment:
-      - API_BASE_URL=http://192.168.1.211:5000
+      - API_BASE_URL=http://54.89.158.217:5000
       - WEB_PUSH_PUBLIC_KEY=BJ5IxJBWdeqFDJTvrZ4wNRu7UY2XigDXjgiUBYEYVXDudxhEs0ReOJRBcBHsPYgZ5dyV8VjyqzbQKS8V7bUAglk
-      - NOTIFICATIONS_API_URL=http://192.168.1.211:4000
+      - NOTIFICATIONS_API_URL=http://54.89.158.217:4000
     ports:
-      - "3001:3000"
+      - "80:80"
+      - "443:443"
   polls-api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
