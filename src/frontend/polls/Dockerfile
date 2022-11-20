@@ -1,13 +1,22 @@
-FROM node:16-alpine
+FROM node:16-alpine as build
 WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
 COPY . .
 
 RUN npm i -g
 RUN yarn install
 RUN npm run build
 
-ENV NODE_ENV production
+FROM nginx:alpine as server
+
+WORKDIR /home
+
+COPY --from=build /app .
+
+COPY nginx.conf /etc/nginx/
+
+RUN cp -a build/* /usr/share/ngnix/html
 
 EXPOSE 3000
-# Start the app
-CMD [ "npx", "serve", "build" ]
+
+ENTRYPOINT ["nginx"]

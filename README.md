@@ -1,6 +1,9 @@
-# pocket-polls
+# Mobile polling application - Progressive Web application using React and .Net technologies
+
 React PWA playground
 
+## Architecture
+![alt text](architecture.svg)
 
 ## Entities
 
@@ -13,7 +16,3 @@ React PWA playground
     - multiple choice
     - text answer
 5. Answer - Respondant answer to specific question
-
-
-## Architecture
-![alt text](architecture.svg)
