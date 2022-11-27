@@ -175,7 +175,12 @@ function CreatePoll() {
 
     function QuestionsPreview(props) {
 
-        const [questionNumber, setQuestionNumber] = useState(0)
+        let lastQuestion = 0;
+        if (props.questions != null && props.questions.length > 0) {
+            lastQuestion = props.questions.length -1;
+        }
+
+        const [questionNumber, setQuestionNumber] = useState(lastQuestion)
 
         const prevQuestion = () => {
             if (questionNumber > 0) {
