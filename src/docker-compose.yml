@@ -45,17 +45,17 @@ services:
     build:
       context: frontend/polls
       dockerfile: Dockerfile
-    depends_on:
-      - sql-server
-      - rabbitmq
-      - polls-api
-      - push-notifications-api
+    # depends_on:
+      # - sql-server
+      # - rabbitmq
+      # - polls-api
+      # - push-notifications-api
  webserver:
     image: nginx:mainline-alpine
     container_name: webserver
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "8080:80"
     volumes:
       - web-root:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
@@ -63,7 +63,7 @@ services:
       - certbot-var:/var/lib/letsencrypt
     depends_on:
       - polls-gui
-  certbot:
+ certbot:
     image: certbot/certbot
     container_name: certbot
     volumes:
@@ -80,5 +80,5 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/sammy/node_project/views/
+      device: /home/pocket-polls/src/frontend/polls
       o: bind
