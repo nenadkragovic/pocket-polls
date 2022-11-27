@@ -55,12 +55,14 @@ services:
     container_name: webserver
     restart: unless-stopped
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     volumes:
       - web-root:/var/www/html
       - ./nginx-conf:/etc/nginx/conf.d
       - certbot-etc:/etc/letsencrypt
       - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
     depends_on:
       - polls-gui
  certbot:
@@ -80,5 +82,11 @@ volumes:
     driver: local
     driver_opts:
       type: none
-      device: /home/pocket-polls/src/frontend/polls
+      device: /home/ubuntu/pocket-polls/src/frontend/polls
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/pocket-polls/src/dhparam/
       o: bind
