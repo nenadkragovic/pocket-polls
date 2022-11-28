@@ -45,11 +45,11 @@ services:
     build:
       context: frontend/polls
       dockerfile: Dockerfile
-    # depends_on:
-      # - sql-server
-      # - rabbitmq
-      # - polls-api
-      # - push-notifications-api
+    depends_on:
+      - sql-server
+      - rabbitmq
+      - polls-api
+      - push-notifications-api
  webserver:
     image: nginx:mainline-alpine
     container_name: webserver
