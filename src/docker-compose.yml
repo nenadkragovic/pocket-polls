@@ -74,7 +74,7 @@ services:
       - web-root:/var/www/html
     depends_on:
       - webserver
-    command: certonly --webroot --webroot-path=/var/www/html --email nenadkragovic@gmail.com --agree-tos --no-eff-email --staging -d pocket-polls.click  -d www.pocket-polls.click
+    command: certonly --webroot --webroot-path=/var/www/html --email nenadkragovic@gmail.com --agree-tos --no-eff-email --force-renewal -d pocket-polls.click  -d www.pocket-polls.click -d api.pocket-polls.click -d notifications.pocket-polls.click
 volumes:
   certbot-etc:
   certbot-var:
