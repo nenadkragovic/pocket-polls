@@ -91,8 +91,6 @@ app.UseForwardedHeaders();
 
 app.CreateDatabase();
 
-app.UseHttpsRedirection();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
