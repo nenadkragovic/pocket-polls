@@ -51,7 +51,7 @@ const broadcastMessage = (notification) => {
                             console.log('NOTIFICATION SENT TO USER: ', data.UserId);
                         })
                         .catch((e) => {
-                            console.log('NOTIFICATION IS NOT SENT TO USER: ', data.UserId);
+                            console.log('NOTIFICATION IS NOT SENT TO USER: ', e.message);
                         });
                     }
                     catch(e) { console.log(e) }
