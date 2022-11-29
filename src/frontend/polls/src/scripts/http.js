@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const { API_BASE_URL ='https://www.pocket-polls.click' } = process.env
+const { API_BASE_URL ='https://www.pocket-polls.click/api' } = process.env
 
 export const request = async (url, method, data) => {
 	return await axios({
