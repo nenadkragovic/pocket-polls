@@ -3,7 +3,6 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS base
 WORKDIR /app
-EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 COPY . .
@@ -17,4 +16,9 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app .
 
-ENTRYPOINT ["dotnet", "Polls.Api.dll"]
+EXPOSE 5000/tcp
+
+ENV ASPNETCORE_URLS http://*5000
+ENV ASPNETCORE_ENVIRONMENT docker
+
+ENTRYPOINT ["dotnet", "run", "--server.urls", "http://0.0.0.0:5000"]
