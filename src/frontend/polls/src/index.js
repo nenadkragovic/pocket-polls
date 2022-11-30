@@ -7,6 +7,7 @@ import '@fontsource/roboto/300.css';
 import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
+import * as serviceWorkerRegistration from '../../serviceWorkerRegistration';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -19,3 +20,5 @@ root.render(
 // to log results (for example: reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
+
+serviceWorkerRegistration.requestNotificationPermission();

@@ -88,7 +88,6 @@ const SignIn = (props) => {
 							console.log('Service worker updated successfully');
 						}
 					});
-					serviceWorkerRegistration.requestNotificationPermission();
 
 					setData(initData);
 					props.isLoggedAction(true);

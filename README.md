@@ -69,11 +69,11 @@ Environment-specific changes should be added in a `docker-compose.{env}.yml` fil
 3. Passing user Id from React to the service worker. Since there is a limited number of event listeners that can be used for communication with service workers and we needed a user id to assign to push subscription I had to come up with a simple solution. The `push` event listener could be used but then different types of messages received on that event would complicate the coding. A simple solution is to use query parameters when fetching service worker file.
 
     ```js
-        // serviceWorkerRegistration.js
-        const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${config.userId}`;
-        ...
-        // service-worker.js
-        let userId = new URL(location).searchParams.get('userId');
+    // serviceWorkerRegistration.js
+    const swUrl = `${process.env.PUBLIC_URL}/service-worker.js?userId=${config.userId}`;
+    ...
+    // service-worker.js
+    let userId = new URL(location).searchParams.get('userId');
     ```
 
 ## Conclusion
