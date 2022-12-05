@@ -155,5 +155,5 @@ const showLocalNotification = (title, body, swRegistration) => {
 
 // KEEP ALIVE SERVICE WORKER
 setInterval(function(){
-  fetch('/ping.txt')
+  fetch(NOTIFICATIONS_API_URL)
 }, 8000)
