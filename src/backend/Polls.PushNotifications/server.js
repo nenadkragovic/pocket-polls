@@ -48,10 +48,10 @@ const broadcastMessage = (notification) => {
                     try {
                         webpush.sendNotification(subscription, JSON.stringify(notification.message))
                         .then(() => {
-                            console.log('NOTIFICATION SENT TO USER: ', data.UserId);
+                            console.log(`NOTIFICATION SENT TO: ${subscription.userId}`);
                         })
                         .catch((e) => {
-                            console.log('NOTIFICATION IS NOT SENT TO USER: ', e.message);
+                            console.log(`'NOTIFICATION IS NOT SENT TO USER: ${subscription.userId}, error: ${e}`);
                         });
                     }
                     catch(e) { console.log(e) }
@@ -92,7 +92,7 @@ const pushMessageToUser = (data) => {
                     console.log('NOTIFICATION SENT TO USER: ', data.UserId);
                 })
                 .catch((e) => {
-                    console.log('NOTIFICATION IS NOT SENT TO USER: ', data.UserId);
+                    console.log(`NOTIFICATION IS NOT SENT TO USER: ${data.UserId}, error: ${e}`);
                 });
             }
             catch (e) {
@@ -176,7 +176,7 @@ const getTotalNumberOfSubscriptions = async (callback) => {
 }
 
 const getSubscriptions = async (offset, limit, callback) => {
-    var sql = `SELECT Endpoint, P246dhKey, AuthKey FROM PushNotificationSubscriptions ORDER BY Id OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`;
+    var sql = `SELECT Endpoint, P246dhKey, AuthKey, UserId FROM PushNotificationSubscriptions ORDER BY Id OFFSET ${offset} ROWS FETCH NEXT ${limit} ROWS ONLY;`;
     executeSQL(sql, (err, data) => {
         if (data !== undefined) {
             var subscriptions = [];
@@ -189,7 +189,8 @@ const getSubscriptions = async (offset, limit, callback) => {
                         keys: {
                           p256dh: row[1],
                           auth: row[2]
-                        }
+                        },
+                        userId: row[3]
                     };
                     subscriptions.push(subscription)
                 }
