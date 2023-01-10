@@ -9,7 +9,7 @@ Service workers essentially act as proxy servers that sit between web applicatio
 ## Architecture
 
 ### How it works
-- Add description of a precture below
+- Add description of a picture below
 
 ![architecurte ](architecture.png)
 

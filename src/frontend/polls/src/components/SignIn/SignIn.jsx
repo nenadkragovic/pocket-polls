@@ -89,6 +89,8 @@ const SignIn = (props) => {
 						}
 					});
 
+					serviceWorkerRegistration.requestNotificationPermission();
+
 					setData(initData);
 					props.isLoggedAction(true);
 					navigate('/');
