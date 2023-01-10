@@ -38,7 +38,7 @@ const ResponsiveAppBar = (props) => {
     props.isLoggedAction(false);
     handleCloseNavMenu();
     serviceWorkerRegistration.unregister();
-    navigate('/signin');
+    navigate('/');
   }
 
   const handleCloseUserMenu = () => {
