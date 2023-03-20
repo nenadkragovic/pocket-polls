@@ -1,0 +1,92 @@
+version: '3.4'
+
+services:
+ sql-server:
+    container_name: sql-server-db
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    ports:
+      - "1433:1433"
+    environment:
+      SA_PASSWORD: "5tgbNHY^"
+      ACCEPT_EULA: "Y"
+ rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "4369:4369"
+      - "5672:5672"
+      - "15672:15672"
+      - "25672:25672"
+      - "35197:35197"
+    volumes:
+      - ./data:/var/lib/rabbitmq
+      - ./data/logs:/var/log/rabbitmq
+    hostname: rabbit
+    environment:
+      - RABBIT_DEFAULT_USER="admin"
+      - RABBIT_DEFAULT_PASS="5tgbNHY^"
+ polls-api:
+    image: polls-api
+    build:
+      context: backend
+      dockerfile: Dockerfile-API
+    depends_on:
+      - sql-server
+      - rabbitmq
+ push-notifications-api:
+    image: push-notifications-api
+    build:
+      context: backend/Polls.PushNotifications
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
+ polls-gui:
+    image: polls-gui
+    build:
+      context: frontend/polls
+      dockerfile: Dockerfile
+    depends_on:
+      - sql-server
+      - rabbitmq
+      - polls-api
+      - push-notifications-api
+ webserver:
+    image: nginx:mainline-alpine
+    container_name: webserver
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - web-root:/var/www/html
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - dhparam:/etc/ssl/certs
+    depends_on:
+      - polls-gui
+ certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    depends_on:
+      - webserver
+    command: certonly --webroot --webroot-path=/var/www/html --email nenadkragovic@gmail.com --agree-tos --no-eff-email --force-renewal -d pocket-polls.click  -d www.pocket-polls.click -d api.pocket-polls.click -d notifications.pocket-polls.click
+volumes:
+  certbot-etc:
+  certbot-var:
+  web-root:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/pocket-polls/src/frontend/polls
+      o: bind
+  dhparam:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/ubuntu/pocket-polls/src/dhparam/
+      o: bind
